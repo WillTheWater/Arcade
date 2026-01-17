@@ -16,3 +16,9 @@ target_include_directories(Arcade PRIVATE Engine/Include)
 target_compile_features(Arcade PRIVATE cxx_std_20)
 target_compile_options(Arcade PRIVATE $<IF:$<CXX_COMPILER_ID:MSVC>, /W4, -Wall -Wextra>)
 target_link_libraries(Arcade PRIVATE SFML::Graphics SFML::Audio SFML::Main)
+
+add_custom_command(TARGET Arcade POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/Assets
+            $<TARGET_FILE_DIR:Arcade>/Assets
+)
