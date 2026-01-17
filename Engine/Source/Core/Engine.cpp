@@ -1,14 +1,15 @@
 #include "Core/Engine.h"
+#include "Core/EngineConfig.h"
 
 Engine::Engine()
-	: GameWindow{ sf::VideoMode::getDesktopMode(), "Arcade", sf::Style::Default, sf::State::Windowed }
+	: GameWindow{ sf::VideoMode::getDesktopMode(), EngConfig.WindowTitle, sf::Style::Default, sf::State::Windowed }
 {
 	GameWindow.setIcon(sf::Image("Assets/icon.png"));
 	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
 	
 	// For Debug ONLY
-	GameWindow.setSize({ 1920u, 1080u });
-	GameWindow.setPosition({ 1920/2, 1080/2 });
+	GameWindow.setSize(sf::Vector2u(EngConfig.WindowSize));
+	GameWindow.setPosition(sf::Vector2i(EngConfig.WindowSize.x / 2, EngConfig.WindowSize.y / 2));
 }
 
 void Engine::ProcessEvents()
