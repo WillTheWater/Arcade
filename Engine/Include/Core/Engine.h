@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "Core/EngineVisitor.h"
+
 class Engine
 {
 public:
@@ -16,4 +18,8 @@ public:
 
 private:
 	sf::RenderWindow GameWindow;
+	friend EngineVisitor;
+
+private:
+	void EventWindowClose();
 };
