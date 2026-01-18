@@ -46,7 +46,9 @@ void Engine::EventWindowClose()
 
 void Engine::EventWindowResized(sf::Vector2u Size)
 {
-
+	LOG("Num: {}", Manager.Randomizer.Random(1, 10));
+	LOG("Num: {}", Manager.Randomizer.Random(1.f, 100.f));
+	LOG("Bool: {}", Manager.Randomizer.Random());
 }
 
 void Engine::EventWindowFocusLost()

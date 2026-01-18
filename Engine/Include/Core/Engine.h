@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Core/EngineVisitor.h"
+#include "Core/Managers.h"
 
 class Engine
 {
@@ -18,6 +19,8 @@ public:
 
 private:
 	sf::RenderWindow GameWindow;
+	Managers Manager;
+
 	friend EngineVisitor;
 
 private:
