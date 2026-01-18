@@ -1,11 +1,13 @@
 #include "Core/Engine.h"
 #include "Core/EngineConfig.h"
+#include "Utilities/Log.h"
 
 Engine::Engine()
 	: GameWindow{ sf::VideoMode::getDesktopMode(), EngConfig.WindowTitle, sf::Style::Default, sf::State::Windowed }
 {
 	GameWindow.setIcon(sf::Image("Assets/icon.png"));
 	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
+	if (EngConfig.DisableSFMLLogging) { sf::err().rdbuf(nullptr); }
 	
 	// For Debug ONLY
 	GameWindow.setSize(sf::Vector2u(EngConfig.WindowSize));
@@ -40,4 +42,19 @@ bool Engine::IsRunning() const
 void Engine::EventWindowClose()
 {
 	GameWindow.close();
+}
+
+void Engine::EventWindowResized(sf::Vector2u Size)
+{
+
+}
+
+void Engine::EventWindowFocusLost()
+{
+	LOG("Window Focus Lost!");
+}
+
+void Engine::EventWindowFocusGained()
+{
+	LOG("Window Focus Gained!");
 }

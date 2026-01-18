@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 3.30.3)
 project(Arcade CXX)
 
 set(SFML_BUILD_NETWORK OFF)
+set(SPDLOG_USE_STD_FORMAT ON)
 
 include(FetchContent)
 FetchContent_Declare(sfml URL https://github.com/SFML/SFML/archive/refs/tags/3.0.2.tar.gz)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
-FetchContent_MakeAvailable(sfml json)
+FetchContent_Declare(logs URL https://github.com/gabime/spdlog/archive/refs/tags/v1.17.0.tar.gz)
+FetchContent_MakeAvailable(sfml json logs)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Source/*.cpp
@@ -33,6 +35,7 @@ target_link_libraries(Arcade PRIVATE
     SFML::Audio
     SFML::Main
     nlohmann_json::nlohmann_json
+    spdlog::spdlog
 )
 
 add_custom_command(TARGET Arcade POST_BUILD

@@ -22,4 +22,7 @@ private:
 
 private:
 	void EventWindowClose();
+	void EventWindowResized(sf::Vector2u Size);
+	void EventWindowFocusLost();
+	void EventWindowFocusGained();
 };

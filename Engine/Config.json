@@ -1,4 +1,5 @@
 {
   "WindowTitle": "Arcade",
-  "WindowSize":  [1920, 1080]
+  "WindowSize": [ 1920, 1080 ],
+  "DisableSFMLLogging": true
 }

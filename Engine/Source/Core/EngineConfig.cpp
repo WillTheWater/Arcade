@@ -11,4 +11,5 @@ EngineConfig::EngineConfig()
 	nlohmann::json Json = nlohmann::json::parse(Config);
 	WindowTitle = Json["WindowTitle"];
 	WindowSize = { Json["WindowSize"][0], Json["WindowSize"][1] };
+	DisableSFMLLogging = { Json["DisableSFMLLogging"] };
 }
