@@ -40,9 +40,6 @@ target_link_libraries(Arcade PRIVATE
 
 add_custom_command(TARGET Arcade POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_CURRENT_SOURCE_DIR}/Assets
-            $<TARGET_FILE_DIR:Arcade>/Assets
-    COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Config.json
-            $<TARGET_FILE_DIR:Arcade>/Engine/Config.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/Content
+            $<TARGET_FILE_DIR:Arcade>/Content
 )

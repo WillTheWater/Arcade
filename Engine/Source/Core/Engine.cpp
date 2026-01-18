@@ -5,13 +5,16 @@
 Engine::Engine()
 	: GameWindow{ sf::VideoMode::getDesktopMode(), EngConfig.WindowTitle, sf::Style::Default, sf::State::Windowed }
 {
-	GameWindow.setIcon(sf::Image("Assets/icon.png"));
+	GameWindow.setIcon(sf::Image("Content/Assets/icon.png"));
 	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
 	if (EngConfig.DisableSFMLLogging) { sf::err().rdbuf(nullptr); }
 	
 	// For Debug ONLY
 	GameWindow.setSize(sf::Vector2u(EngConfig.WindowSize));
 	GameWindow.setPosition(sf::Vector2i(EngConfig.WindowSize.x / 2, EngConfig.WindowSize.y / 2));
+	Manager.Save.Set<int>("Score", 100);
+	int Score = Manager.Save.Get<int>("Score");
+	LOG("Score: {}", Score);
 }
 
 void Engine::ProcessEvents()
