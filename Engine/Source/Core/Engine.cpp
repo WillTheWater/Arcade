@@ -24,7 +24,7 @@ void Engine::ProcessEvents()
 
 void Engine::Update()
 {
-
+	Manager.Timer.Tick();
 }
 
 void Engine::Render()
@@ -42,6 +42,7 @@ bool Engine::IsRunning() const
 void Engine::EventWindowClose()
 {
 	GameWindow.close();
+	LOG("Window Closed After: {:.2f} seconds", Manager.Timer.GetElapsedTime());
 }
 
 void Engine::EventWindowResized(sf::Vector2u Size)
