@@ -5,7 +5,7 @@
 Engine::Engine()
 	: GameWindow{ sf::VideoMode::getDesktopMode(), EngConfig.WindowTitle, sf::Style::Default, sf::State::Windowed }
 {
-	GameWindow.setIcon(sf::Image("Content/Assets/icon.png"));
+	GameWindow.setIcon(sf::Image("Content/Assets/Textures/icon.png"));
 	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
 	if (EngConfig.DisableSFMLLogging) { sf::err().rdbuf(nullptr); }
 	
@@ -51,7 +51,7 @@ void Engine::EventWindowClose()
 void Engine::EventWindowResized(sf::Vector2u Size)
 {
 	LOG("Num: {}", Manager.Randomizer.Random(1, 10));
-	LOG("Num: {}", Manager.Randomizer.Random(1.f, 100.f));
+	LOG("Num: {}", Manager.Randomizer.Random(1.f, (float)Size.y));
 	LOG("Bool: {}", Manager.Randomizer.Random());
 }
 
