@@ -23,6 +23,11 @@ add_executable(Arcade
     ${HEADERS}
 )
 
+set_target_properties(Arcade PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:Arcade>"
+)
+
+
 target_include_directories(Arcade PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Include
 )

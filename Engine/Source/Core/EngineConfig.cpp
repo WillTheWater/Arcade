@@ -6,11 +6,12 @@
 
 EngineConfig::EngineConfig()
 {
-	std::ifstream Config("Engine/Config.json");
+	std::ifstream Config("Content/Config.json");
 	assert(Config);
 	nlohmann::json json = nlohmann::json::parse(Config);
 	WindowTitle = json["WindowTitle"];
 	WindowSize = { json["WindowSize"][0], json["WindowSize"][1] };
 	DisableSFMLLogging = { json["DisableSFMLLogging"] };
 	MaxDeltaTime = sf::seconds(json["MaxDeltaTime"]);
+	GlobalVolume = json["GlobalVolume"];
 }

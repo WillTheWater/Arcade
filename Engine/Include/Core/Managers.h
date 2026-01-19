@@ -5,6 +5,8 @@
 #include "SystemManagers/SaveManager.h"
 #include "SystemManagers/ClipboardManager.h"
 #include "SystemManagers/AssetManager.h"
+#include "SystemManagers/AudioManager.h"
+#include "SystemManagers/InputManager.h"
 
 struct Managers
 {
@@ -13,4 +15,6 @@ struct Managers
 	SaveManager Save;
 	ClipboardManager Clipboard;
 	AssetManager Assets;
+	AudioManager Audio;
+	InputManager Input;
 };

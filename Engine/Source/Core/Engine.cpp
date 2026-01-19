@@ -3,18 +3,21 @@
 #include "Utilities/Log.h"
 
 Engine::Engine()
-	: GameWindow{ sf::VideoMode::getDesktopMode(), EngConfig.WindowTitle, sf::Style::Default, sf::State::Windowed }
+	: GameWindow{ sf::VideoMode::getDesktopMode(), EConfig.WindowTitle, sf::Style::Default, sf::State::Windowed }
 {
 	GameWindow.setIcon(sf::Image("Content/Assets/Textures/icon.png"));
 	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
-	if (EngConfig.DisableSFMLLogging) { sf::err().rdbuf(nullptr); }
+	if (EConfig.DisableSFMLLogging) { sf::err().rdbuf(nullptr); }
+	Manager.Audio.SetGlobalVolume(EConfig.GlobalVolume);
+	GameWindow.setKeyRepeatEnabled(false);
 	
 	// For Debug ONLY
-	GameWindow.setSize(sf::Vector2u(EngConfig.WindowSize));
-	GameWindow.setPosition(sf::Vector2i(EngConfig.WindowSize.x / 2, EngConfig.WindowSize.y / 2));
+	GameWindow.setSize(sf::Vector2u(EConfig.WindowSize));
+	GameWindow.setPosition(sf::Vector2i(EConfig.WindowSize.x / 2, EConfig.WindowSize.y / 2));
 	Manager.Save.Set<int>("Score", 100);
 	int Score = Manager.Save.Get<int>("Score");
 	LOG("Score: {}", Score);
+	LOG("Global Volume: {}", EConfig.GlobalVolume);
 }
 
 void Engine::ProcessEvents()
@@ -63,4 +66,14 @@ void Engine::EventWindowFocusLost()
 void Engine::EventWindowFocusGained()
 {
 	LOG("Window Focus Gained!");
+}
+
+void Engine::EventGamepadConnected(int GamepadID)
+{
+	LOG("Gamepad Connected {}", GamepadID);
+}
+
+void Engine::EventGamepadDisconnected(int GamepadID)
+{
+	LOG("Gamepad Disconnected {}", GamepadID);
 }

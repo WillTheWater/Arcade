@@ -2,5 +2,6 @@
   "WindowTitle": "Arcade",
   "WindowSize": [ 1920, 1080 ],
   "DisableSFMLLogging": true,
-  "MaxDeltaTime": 0.02
+  "MaxDeltaTime": 0.02,
+  "GlobalVolume":  100
 }

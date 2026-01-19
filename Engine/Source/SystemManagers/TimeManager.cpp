@@ -6,7 +6,7 @@
 void TimeManager::Tick()
 {
 	const sf::Time CurrentTime = DeltaClock.getElapsedTime();
-	DeltaTime = std::min(CurrentTime - PreviousTime, EngConfig.MaxDeltaTime);
+	DeltaTime = std::min(CurrentTime - PreviousTime, EConfig.MaxDeltaTime);
 	PreviousTime = CurrentTime;
 }
 
