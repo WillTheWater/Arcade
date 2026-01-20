@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Graphics/RenderWindow.hpp>
+
 #include "SystemManagers/RandomManager.h"
 #include "SystemManagers/TimeManager.h"
 #include "SystemManagers/SaveManager.h"
@@ -8,6 +10,7 @@
 #include "SystemManagers/AudioManager.h"
 #include "SystemManagers/InputManager.h"
 #include "SystemManagers/RenderManager.h"
+#include "SystemManagers/ScreenshotManager.h"
 
 struct Managers
 {
@@ -19,4 +22,7 @@ struct Managers
 	AudioManager Audio;
 	InputManager Input;
 	RenderManager Renderer;
+	ScreenshotManager ScreenShot;
+
+	Managers(sf::RenderWindow& Window) : ScreenShot{ Window } {}
 };

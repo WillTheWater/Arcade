@@ -30,3 +30,11 @@ void EngineVisitor::operator()(const sf::Event::JoystickDisconnected& Gamepad)
 {
 	GameEngine.EventGamepadDisconnected(Gamepad.joystickId);
 }
+
+void EngineVisitor::operator()(const sf::Event::KeyPressed& Key)
+{
+	if (Key.control && Key.shift && Key.scancode == sf::Keyboard::Scan::S)
+	{
+		GameEngine.EventScreenshot();
+	}
+}

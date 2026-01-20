@@ -5,6 +5,7 @@
 Engine::Engine()
 			   // sf::VideoMode::getDesktopMode()
 	: GameWindow{ sf::VideoMode(sf::Vector2u(EConfig.WindowSize)), EConfig.WindowTitle, sf::Style::Default, sf::State::Windowed}
+	, Manager{GameWindow}
 {
 	GameWindow.setIcon(sf::Image("Content/Assets/Textures/icon.png"));
 	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
@@ -13,7 +14,7 @@ Engine::Engine()
 	GameWindow.setKeyRepeatEnabled(false);
 	
 	// For Debug ONLY
-	GameWindow.setPosition(sf::Vector2i(EConfig.WindowSize.x / 2, EConfig.WindowSize.y / 2));
+	GameWindow.setPosition(sf::Vector2i((int)(EConfig.WindowSize.x / 2), (int)(EConfig.WindowSize.y / 2)));
 	Manager.Save.Set<int>("Score", 100);
 	int Score = Manager.Save.Get<int>("Score");
 	LOG("Score: {}", Score);
@@ -67,6 +68,11 @@ void Engine::EventWindowFocusLost()
 void Engine::EventWindowFocusGained()
 {
 	LOG("Window Focus Gained!");
+}
+
+void Engine::EventScreenshot() const
+{
+	Manager.ScreenShot.TakeScreenshot();
 }
 
 void Engine::EventGamepadConnected(int GamepadID)
