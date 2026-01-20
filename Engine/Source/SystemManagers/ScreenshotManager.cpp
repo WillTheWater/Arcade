@@ -4,9 +4,6 @@
 #include <format>
 #include <string>
 
-#include <iostream>
-#include <filesystem>
-
 #include "SystemManagers/ScreenshotManager.h"
 #include "Utilities/Log.h"
 
@@ -17,8 +14,6 @@ ScreenshotManager::ScreenshotManager(const sf::RenderWindow& Window)
 
 void ScreenshotManager::TakeScreenshot() const
 {
-	std::cout << std::filesystem::current_path() << '\n';
-
 	std::string Filename = std::format("Screenshot_{:%Y%m%d_%H%M%S}.png",
 		floor<std::chrono::microseconds>(std::chrono::system_clock::now()));
 

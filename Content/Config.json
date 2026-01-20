@@ -4,5 +4,9 @@
   "DisableSFMLLogging": true,
   "MaxDeltaTime": 0.02,
   "GlobalVolume": 100,
-  "BackgroundColor": [255, 255, 255]
+  "BackgroundColor": [ 255, 255, 255 ],
+  "CursorRadius": 5,
+  "CursorSpeed": 1200,
+  "CursorColor": [ 255, 255, 255 ],
+  "JoystickDeadZone": 0.1
 }

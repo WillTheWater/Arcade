@@ -12,6 +12,7 @@ Engine::Engine()
 	if (EConfig.DisableSFMLLogging) { sf::err().rdbuf(nullptr); }
 	Manager.Audio.SetGlobalVolume(EConfig.GlobalVolume);
 	GameWindow.setKeyRepeatEnabled(false);
+	GameWindow.setMouseCursorVisible(false);
 	
 	// For Debug ONLY
 	GameWindow.setPosition(sf::Vector2i((int)(EConfig.WindowSize.x / 2), (int)(EConfig.WindowSize.y / 2)));
@@ -26,12 +27,14 @@ void Engine::ProcessEvents()
 	while (std::optional<sf::Event> Event = GameWindow.pollEvent())
 	{
 		Event->visit(EngineVisitor{ *this });
+		Manager.GUI.HandleEvents(*Event);
 	}
 }
 
 void Engine::Update()
 {
 	Manager.Timer.Tick();
+	Manager.Cursor.Update(Manager.Timer.GetDeltaTime());
 }
 
 void Engine::Render()
@@ -39,6 +42,8 @@ void Engine::Render()
 	GameWindow.clear(sf::Color::Black);
 	Manager.Renderer.BeginDrawing();
 	GameWindow.draw(sf::Sprite(Manager.Renderer.FinishDrawing()));
+	Manager.GUI.Render();
+	Manager.Cursor.Render();
 	GameWindow.display();
 }
 

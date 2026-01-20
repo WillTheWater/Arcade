@@ -3,12 +3,14 @@ project(Arcade CXX)
 
 set(SFML_BUILD_NETWORK OFF)
 set(SPDLOG_USE_STD_FORMAT ON)
+set(TGUI_BACKEND SFML_GRAPHICS)
 
 include(FetchContent)
 FetchContent_Declare(sfml URL https://github.com/SFML/SFML/archive/refs/tags/3.0.2.tar.gz)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
 FetchContent_Declare(logs URL https://github.com/gabime/spdlog/archive/refs/tags/v1.17.0.tar.gz)
-FetchContent_MakeAvailable(sfml json logs)
+FetchContent_Declare(tgui URL https://github.com/texus/TGUI/archive/refs/tags/v1.11.0.tar.gz)
+FetchContent_MakeAvailable(sfml json logs tgui)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Source/*.cpp
@@ -27,7 +29,6 @@ set_target_properties(Arcade PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:Arcade>"
 )
 
-
 target_include_directories(Arcade PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Include
 )
@@ -41,9 +42,10 @@ target_link_libraries(Arcade PRIVATE
     SFML::Main
     nlohmann_json::nlohmann_json
     spdlog::spdlog
+    TGUI::TGUI
 )
 
-add_custom_command(TARGET Arcade POST_BUILD
+add_custom_command(TARGET Arcade PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_CURRENT_SOURCE_DIR}/Content
             $<TARGET_FILE_DIR:Arcade>/Content

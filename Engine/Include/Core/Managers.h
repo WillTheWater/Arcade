@@ -11,6 +11,8 @@
 #include "SystemManagers/InputManager.h"
 #include "SystemManagers/RenderManager.h"
 #include "SystemManagers/ScreenshotManager.h"
+#include "Systemmanagers/CursorManager.h"
+#include "SystemManagers/GUIManager.h"
 
 struct Managers
 {
@@ -23,6 +25,12 @@ struct Managers
 	InputManager Input;
 	RenderManager Renderer;
 	ScreenshotManager ScreenShot;
+	CursorManager Cursor;
+	GUIManager GUI;
 
-	Managers(sf::RenderWindow& Window) : ScreenShot{ Window } {}
+	Managers(sf::RenderWindow& Window) 
+		: ScreenShot{ Window } 
+		, Cursor{Window}
+		, GUI{Window}
+	{}
 };
