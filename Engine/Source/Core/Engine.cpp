@@ -8,6 +8,8 @@ Engine::Engine()
 	, Manager{GameWindow}
 	, Scenes{SceneFactory::CreateScenes(Manager)}
 	, CurrentScene{nullptr}
+	, PauseMenu{Manager.GUI}
+	, CursorVisible{true}
 {
 	GameWindow.setIcon(sf::Image("Content/Assets/Textures/icon.png"));
 	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
@@ -34,7 +36,14 @@ void Engine::ProcessEvents()
 	{
 		Event->visit(EngineVisitor{ *this });
 		Manager.GUI.HandleEvents(*Event);
-		//CurrentScene->OnEvent(*Event);
+		//if (!PauseMenu.IsVisible())
+		//{
+		//	//CurrentScene->OnEvent(*Event);
+		//}
+	}
+	if (const auto Selection = PauseMenu.GetSelection())
+	{
+		EventPauseMenuSelection(*Selection);
 	}
 }
 
@@ -42,7 +51,10 @@ void Engine::Update()
 {
 	Manager.Timer.Tick();
 	Manager.Cursor.Update(Manager.Timer.GetDeltaTime());
-	//CurrentScene->Update();
+	if (!PauseMenu.IsVisible())
+	{
+		//CurrentScene->Update();
+	}
 }
 
 void Engine::Render()
@@ -82,7 +94,7 @@ void Engine::EventWindowFocusLost()
 
 void Engine::EventWindowFocusGained()
 {
-	//CurrentScene->OnPause(false);
+	//CurrentScene->OnPause(PauseMenu.IsVisible());
 	LOG("Window Focus Gained!");
 }
 
@@ -98,6 +110,8 @@ void Engine::EventGamepadConnected(int GamepadID)
 
 void Engine::EventGamepadDisconnected(int GamepadID)
 {
+	//CurrentScene->OnPause(true);
+	PauseMenu.SetVisible(true);
 	LOG("Gamepad Disconnected {}", GamepadID);
 }
 
@@ -118,10 +132,48 @@ void Engine::EventChangeScene(const std::string& SceneName)
 
 void Engine::EventRestartScene()
 {
+	PauseMenu.SetVisible(false);
 	Manager.Scene.ReloadScene();
 }
 
 void Engine::EventReturnToMainMenu()
 {
+	PauseMenu.SetVisible(false);
 	Manager.Scene.ChangeScene("MainMenu");
+	Manager.Cursor.SetVisibility(true);
+	Manager.Cursor.SetCursorSpeed(EConfig.CursorSpeed);
+}
+
+void Engine::EventPauseMenuToggle()
+{
+	const bool Visibility = !PauseMenu.IsVisible();
+	PauseMenu.SetVisible(Visibility);
+
+	const bool CursorVisibility = Manager.Cursor.IsVisible();
+	Manager.Cursor.SetVisibility(Visibility || CursorVisibility);
+	CursorVisible = CursorVisibility;
+
+	//CurrentScene->OnPause(Visibility);
+	LOG(Visibility ? "Game Paused!" : "Game Unpaused!");
+}
+
+void Engine::EventPauseMenuSelection(OverlaySelection Selection)
+{
+	switch (Selection)
+	{
+	case OverlaySelection::Resume:
+		EventPauseMenuToggle();
+		break;
+	case OverlaySelection::Restart:
+		EventRestartScene();
+		break;
+	case OverlaySelection::MainMenu:
+		EventReturnToMainMenu();
+		break;
+	case OverlaySelection::Quit:
+		EventWindowClose();
+		break;
+	default:
+		break;
+	}
 }

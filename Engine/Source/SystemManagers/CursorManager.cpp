@@ -2,7 +2,7 @@
 #include <SFML/Window/Mouse.hpp>
 #include <algorithm>
 
-#include "Systemmanagers/CursorManager.h"
+#include "SystemManagers/CursorManager.h"
 #include "Core/EngineConfig.h"
 
 CursorManager::CursorManager(sf::RenderWindow& Window)

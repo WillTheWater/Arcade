@@ -45,6 +45,10 @@ void EngineVisitor::operator()(const sf::Event::KeyPressed& Key)
 	{
 		GameEngine.EventReturnToMainMenu();
 	}
+	else if (Key.scancode == sf::Keyboard::Scan::Escape)
+	{
+		GameEngine.EventPauseMenuToggle();
+	}
 }
 
 void EngineVisitor::operator()(const sf::Event::JoystickButtonPressed& Gamepad)
@@ -54,6 +58,10 @@ void EngineVisitor::operator()(const sf::Event::JoystickButtonPressed& Gamepad)
 		if (*Button == GamepadButton::Select)
 		{
 			GameEngine.EventReturnToMainMenu();
+		}
+		else if (*Button == GamepadButton::Start)
+		{
+			GameEngine.EventPauseMenuToggle();
 		}
 	}
 }

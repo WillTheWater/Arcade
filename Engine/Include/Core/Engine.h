@@ -5,6 +5,7 @@
 #include "Core/EngineVisitor.h"
 #include "Core/Managers.h"
 #include "Scenes/SceneFactory.h"
+#include "Core/Overlay.h"
 
 class Engine
 {
@@ -21,8 +22,12 @@ public:
 private:
 	sf::RenderWindow GameWindow;
 	Managers Manager;
+	
 	SceneFactory::Scenes Scenes;
 	Scene* CurrentScene;
+
+	bool CursorVisible;
+	Overlay PauseMenu;
 
 	friend EngineVisitor;
 
@@ -37,4 +42,6 @@ private:
 	void EventChangeScene(const std::string& SceneName);
 	void EventRestartScene();
 	void EventReturnToMainMenu();
+	void EventPauseMenuToggle();
+	void EventPauseMenuSelection(OverlaySelection Selection);
 };
