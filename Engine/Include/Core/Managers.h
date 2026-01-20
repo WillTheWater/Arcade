@@ -7,6 +7,7 @@
 #include "SystemManagers/AssetManager.h"
 #include "SystemManagers/AudioManager.h"
 #include "SystemManagers/InputManager.h"
+#include "SystemManagers/RenderManager.h"
 
 struct Managers
 {
@@ -17,4 +18,5 @@ struct Managers
 	AssetManager Assets;
 	AudioManager Audio;
 	InputManager Input;
+	RenderManager Renderer;
 };

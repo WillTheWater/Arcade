@@ -14,4 +14,5 @@ EngineConfig::EngineConfig()
 	DisableSFMLLogging = { json["DisableSFMLLogging"] };
 	MaxDeltaTime = sf::seconds(json["MaxDeltaTime"]);
 	GlobalVolume = json["GlobalVolume"];
+	BackgroundColor = { json["BackgroundColor"][0],	json["BackgroundColor"][1],	json["BackgroundColor"][2] };
 }

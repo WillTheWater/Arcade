@@ -3,7 +3,8 @@
 #include "Utilities/Log.h"
 
 Engine::Engine()
-	: GameWindow{ sf::VideoMode::getDesktopMode(), EConfig.WindowTitle, sf::Style::Default, sf::State::Windowed }
+			   // sf::VideoMode::getDesktopMode()
+	: GameWindow{ sf::VideoMode(sf::Vector2u(EConfig.WindowSize)), EConfig.WindowTitle, sf::Style::Default, sf::State::Windowed}
 {
 	GameWindow.setIcon(sf::Image("Content/Assets/Textures/icon.png"));
 	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
@@ -12,7 +13,6 @@ Engine::Engine()
 	GameWindow.setKeyRepeatEnabled(false);
 	
 	// For Debug ONLY
-	GameWindow.setSize(sf::Vector2u(EConfig.WindowSize));
 	GameWindow.setPosition(sf::Vector2i(EConfig.WindowSize.x / 2, EConfig.WindowSize.y / 2));
 	Manager.Save.Set<int>("Score", 100);
 	int Score = Manager.Save.Get<int>("Score");
@@ -36,7 +36,8 @@ void Engine::Update()
 void Engine::Render()
 {
 	GameWindow.clear(sf::Color::Black);
-
+	Manager.Renderer.BeginDrawing();
+	GameWindow.draw(sf::Sprite(Manager.Renderer.FinishDrawing()));
 	GameWindow.display();
 }
 
