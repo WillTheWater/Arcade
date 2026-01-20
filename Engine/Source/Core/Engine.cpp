@@ -6,6 +6,8 @@ Engine::Engine()
 			   // sf::VideoMode::getDesktopMode()
 	: GameWindow{ sf::VideoMode(sf::Vector2u(EConfig.WindowSize)), EConfig.WindowTitle, sf::Style::Default, sf::State::Windowed}
 	, Manager{GameWindow}
+	, Scenes{SceneFactory::CreateScenes(Manager)}
+	, CurrentScene{nullptr}
 {
 	GameWindow.setIcon(sf::Image("Content/Assets/Textures/icon.png"));
 	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
@@ -32,6 +34,7 @@ void Engine::ProcessEvents()
 	{
 		Event->visit(EngineVisitor{ *this });
 		Manager.GUI.HandleEvents(*Event);
+		//CurrentScene->OnEvent(*Event);
 	}
 }
 
@@ -39,12 +42,14 @@ void Engine::Update()
 {
 	Manager.Timer.Tick();
 	Manager.Cursor.Update(Manager.Timer.GetDeltaTime());
+	//CurrentScene->Update();
 }
 
 void Engine::Render()
 {
 	GameWindow.clear(sf::Color::Black);
 	Manager.Renderer.BeginDrawing();
+	//CurrentScene->Render();
 	GameWindow.draw(sf::Sprite(Manager.Renderer.FinishDrawing()));
 	Manager.GUI.Render();
 	Manager.Cursor.Render();
@@ -71,11 +76,13 @@ void Engine::EventWindowResized(sf::Vector2u Size)
 
 void Engine::EventWindowFocusLost()
 {
+	//CurrentScene->OnPause(true);
 	LOG("Window Focus Lost!");
 }
 
 void Engine::EventWindowFocusGained()
 {
+	//CurrentScene->OnPause(false);
 	LOG("Window Focus Gained!");
 }
 
@@ -96,7 +103,17 @@ void Engine::EventGamepadDisconnected(int GamepadID)
 
 void Engine::EventChangeScene(const std::string& SceneName)
 {
-	// TODO:
+	ASSERT(Scenes.contains(SceneName));
+	Scene* NextScene = Scenes.at(SceneName).get();
+	
+	if (CurrentScene)
+	{
+		CurrentScene->OnCleanup();
+	}
+
+	Manager.Input.Clear();
+	//CurrentScene = NextScene;
+	//CurrentScene->Start();
 }
 
 void Engine::EventRestartScene()

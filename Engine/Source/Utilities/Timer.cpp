@@ -24,7 +24,7 @@ void Timer::Restart()
 
 void Timer::Reset()
 {
-	Timerhandle.reset()
+	Timerhandle.reset();
 }
 
 void Timer::SetDuration(float NewDuration)
@@ -44,7 +44,7 @@ float Timer::GetElapsedTime() const
 
 bool Timer::IsRunning() const
 {
-	return Timerhandle.isRunning()
+	return Timerhandle.isRunning();
 }
 
 bool Timer::IsOver() const

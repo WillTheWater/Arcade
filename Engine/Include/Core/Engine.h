@@ -4,6 +4,7 @@
 
 #include "Core/EngineVisitor.h"
 #include "Core/Managers.h"
+#include "Scenes/SceneFactory.h"
 
 class Engine
 {
@@ -20,6 +21,8 @@ public:
 private:
 	sf::RenderWindow GameWindow;
 	Managers Manager;
+	SceneFactory::Scenes Scenes;
+	Scene* CurrentScene;
 
 	friend EngineVisitor;
 

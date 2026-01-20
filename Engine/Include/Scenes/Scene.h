@@ -3,11 +3,12 @@
 #include <sfml/Window/Event.hpp>
 
 #include "Core/Managers.h"
+#include "Scenes/SceneUtilities.h"
 
 class Scene
 {
 public:
-	Scene(Managers& Manager);
+	Scene(Managers& Manager) : MGR{Manager}{}
 	virtual ~Scene() = default;
 
 	virtual void Start() = 0;
