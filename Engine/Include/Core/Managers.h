@@ -13,6 +13,7 @@
 #include "SystemManagers/ScreenshotManager.h"
 #include "Systemmanagers/CursorManager.h"
 #include "SystemManagers/GUIManager.h"
+#include "SystemManagers/SceneManager.h"
 
 struct Managers
 {
@@ -27,6 +28,7 @@ struct Managers
 	ScreenshotManager ScreenShot;
 	CursorManager Cursor;
 	GUIManager GUI;
+	SceneManager Scene;
 
 	Managers(sf::RenderWindow& Window) 
 		: ScreenShot{ Window } 

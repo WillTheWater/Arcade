@@ -37,4 +37,23 @@ void EngineVisitor::operator()(const sf::Event::KeyPressed& Key)
 	{
 		GameEngine.EventScreenshot();
 	}
+	else if (Key.scancode == sf::Keyboard::Scan::R)
+	{
+		GameEngine.EventRestartScene();
+	}
+	else if (Key.scancode == sf::Keyboard::Scan::M)
+	{
+		GameEngine.EventReturnToMainMenu();
+	}
+}
+
+void EngineVisitor::operator()(const sf::Event::JoystickButtonPressed& Gamepad)
+{
+	if (const auto Button = Input::HardwareToLogic(Gamepad.button, Gamepad.joystickId))
+	{
+		if (*Button == GamepadButton::Select)
+		{
+			GameEngine.EventReturnToMainMenu();
+		}
+	}
 }

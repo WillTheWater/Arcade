@@ -31,4 +31,7 @@ private:
 	void EventScreenshot() const;
 	void EventGamepadConnected(int GamepadID);
 	void EventGamepadDisconnected(int GamepadID);
+	void EventChangeScene(const std::string& SceneName);
+	void EventRestartScene();
+	void EventReturnToMainMenu();
 };

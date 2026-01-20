@@ -24,6 +24,10 @@ Engine::Engine()
 
 void Engine::ProcessEvents()
 {
+	if (const auto NextScene = Manager.Scene.GetNextScene())
+	{
+		EventChangeScene(*NextScene);
+	}
 	while (std::optional<sf::Event> Event = GameWindow.pollEvent())
 	{
 		Event->visit(EngineVisitor{ *this });
@@ -88,4 +92,19 @@ void Engine::EventGamepadConnected(int GamepadID)
 void Engine::EventGamepadDisconnected(int GamepadID)
 {
 	LOG("Gamepad Disconnected {}", GamepadID);
+}
+
+void Engine::EventChangeScene(const std::string& SceneName)
+{
+	// TODO:
+}
+
+void Engine::EventRestartScene()
+{
+	Manager.Scene.ReloadScene();
+}
+
+void Engine::EventReturnToMainMenu()
+{
+	Manager.Scene.ChangeScene("MainMenu");
 }
