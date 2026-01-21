@@ -3,27 +3,22 @@
 #include "Utilities/Log.h"
 
 Engine::Engine()
-			   // sf::VideoMode::getDesktopMode()
-	: GameWindow{ sf::VideoMode(sf::Vector2u(EConfig.WindowSize)), EConfig.WindowTitle, sf::Style::Default, sf::State::Windowed}
+	: GameWindow{ sf::VideoMode::getDesktopMode(), EConfig.WindowTitle, sf::Style::None, sf::State::Windowed}
 	, Manager{GameWindow}
 	, Scenes{SceneFactory::CreateScenes(Manager)}
 	, CurrentScene{nullptr}
 	, PauseMenu{Manager.GUI}
 	, CursorVisible{true}
+	, Fullscreen{true}
 {
 	GameWindow.setIcon(sf::Image("Content/Assets/Textures/icon.png"));
-	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
+	GameWindow.setMinimumSize(sf::VideoMode::getDesktopMode().size / 4u);
 	if (EConfig.DisableSFMLLogging) { sf::err().rdbuf(nullptr); }
 	Manager.Audio.SetGlobalVolume(EConfig.GlobalVolume);
 	GameWindow.setKeyRepeatEnabled(false);
 	GameWindow.setMouseCursorVisible(false);
-	
-	// For Debug ONLY
-	GameWindow.setPosition(sf::Vector2i((int)(EConfig.WindowSize.x / 2), (int)(EConfig.WindowSize.y / 2)));
-	Manager.Save.Set<int>("Score", 100);
-	int Score = Manager.Save.Get<int>("Score");
-	LOG("Score: {}", Score);
-	LOG("Global Volume: {}", EConfig.GlobalVolume);
+
+	Manager.Scene.ChangeScene("Bounce");
 }
 
 void Engine::ProcessEvents()
@@ -36,10 +31,10 @@ void Engine::ProcessEvents()
 	{
 		Event->visit(EngineVisitor{ *this });
 		Manager.GUI.HandleEvents(*Event);
-		//if (!PauseMenu.IsVisible())
-		//{
-		//	//CurrentScene->OnEvent(*Event);
-		//}
+		if (!PauseMenu.IsVisible())
+		{
+			CurrentScene->OnEvent(*Event);
+		}
 	}
 	if (const auto Selection = PauseMenu.GetSelection())
 	{
@@ -53,7 +48,7 @@ void Engine::Update()
 	Manager.Cursor.Update(Manager.Timer.GetDeltaTime());
 	if (!PauseMenu.IsVisible())
 	{
-		//CurrentScene->Update();
+		CurrentScene->Update();
 	}
 }
 
@@ -61,7 +56,7 @@ void Engine::Render()
 {
 	GameWindow.clear(sf::Color::Black);
 	Manager.Renderer.BeginDrawing();
-	//CurrentScene->Render();
+	CurrentScene->Render();
 	GameWindow.draw(sf::Sprite(Manager.Renderer.FinishDrawing()));
 	Manager.GUI.Render();
 	Manager.Cursor.Render();
@@ -88,13 +83,13 @@ void Engine::EventWindowResized(sf::Vector2u Size)
 
 void Engine::EventWindowFocusLost()
 {
-	//CurrentScene->OnPause(true);
+	CurrentScene->OnPause(true);
 	LOG("Window Focus Lost!");
 }
 
 void Engine::EventWindowFocusGained()
 {
-	//CurrentScene->OnPause(PauseMenu.IsVisible());
+	CurrentScene->OnPause(PauseMenu.IsVisible());
 	LOG("Window Focus Gained!");
 }
 
@@ -110,7 +105,7 @@ void Engine::EventGamepadConnected(int GamepadID)
 
 void Engine::EventGamepadDisconnected(int GamepadID)
 {
-	//CurrentScene->OnPause(true);
+	CurrentScene->OnPause(true);
 	PauseMenu.SetVisible(true);
 	LOG("Gamepad Disconnected {}", GamepadID);
 }
@@ -126,8 +121,8 @@ void Engine::EventChangeScene(const std::string& SceneName)
 	}
 
 	Manager.Input.Clear();
-	//CurrentScene = NextScene;
-	//CurrentScene->Start();
+	CurrentScene = NextScene;
+	CurrentScene->Start();
 }
 
 void Engine::EventRestartScene()
@@ -144,6 +139,23 @@ void Engine::EventReturnToMainMenu()
 	Manager.Cursor.SetCursorSpeed(EConfig.CursorSpeed);
 }
 
+void Engine::EventToggleFullscreen()
+{
+	auto Desktop = sf::VideoMode::getDesktopMode();
+	sf::Vector2u ScreenSize = Desktop.size;
+	if (Fullscreen)
+	{
+		GameWindow.setSize(ScreenSize / 2u);
+		GameWindow.setPosition((sf::Vector2i)ScreenSize / 4);
+	}
+	else
+	{
+		GameWindow.setSize(ScreenSize);
+		GameWindow.setPosition({ 0,0 });
+	}
+	Fullscreen = !Fullscreen;
+}
+
 void Engine::EventPauseMenuToggle()
 {
 	const bool Visibility = !PauseMenu.IsVisible();
@@ -153,7 +165,7 @@ void Engine::EventPauseMenuToggle()
 	Manager.Cursor.SetVisibility(Visibility || CursorVisibility);
 	CursorVisible = CursorVisibility;
 
-	//CurrentScene->OnPause(Visibility);
+	CurrentScene->OnPause(Visibility);
 	LOG(Visibility ? "Game Paused!" : "Game Unpaused!");
 }
 
@@ -167,8 +179,11 @@ void Engine::EventPauseMenuSelection(OverlaySelection Selection)
 	case OverlaySelection::Restart:
 		EventRestartScene();
 		break;
-	case OverlaySelection::MainMenu:
+	case OverlaySelection::Main_Menu:
 		EventReturnToMainMenu();
+		break;
+	case OverlaySelection::Toggle_Fullscreen:
+		EventToggleFullscreen();
 		break;
 	case OverlaySelection::Quit:
 		EventWindowClose();

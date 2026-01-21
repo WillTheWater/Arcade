@@ -3,9 +3,9 @@
 #include "Utilities/Log.h"
 
 RenderManager::RenderManager()
-	: RenderTarget{sf::Vector2u(EConfig.WindowSize)}
+	: RenderTarget{ sf::VideoMode::getDesktopMode().size }
 	, BackgroundTexture{"Content/Assets/Textures/Background.png"}
-	, Background{EConfig.WindowSize}
+	, Background{ sf::Vector2f(sf::VideoMode::getDesktopMode().size) }
 {
 	RenderTarget.setSmooth(true);
 	Background.setTexture(&BackgroundTexture);

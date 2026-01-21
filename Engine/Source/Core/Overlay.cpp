@@ -36,14 +36,22 @@ void Overlay::InitBackground()
 
 void Overlay::InitButtons()
 {
+	ButtonTexture.load("Content/Assets/Textures/button.png");
 	auto Layout = tgui::VerticalLayout::create();
 	Layout->setSize("37%", "63%");
 	Layout->setPosition("31%", "18%");
+	Layout->getRenderer()->setSpaceBetweenWidgets(20);
 
 	for (const auto& [Selection, Name] : magic_enum::enum_entries<OverlaySelection>())
 	{
-		auto Button = tgui::Button::create(Name.data());
-		Button->setTextSize(30);
+		std::string ButtonText = Name.data();
+		std::replace(ButtonText.begin(), ButtonText.end(), '_', ' ');
+		auto Button = tgui::Button::create(ButtonText.data());
+		Button->getRenderer()->setBorders(0);
+		Button->getRenderer()->setTexture(ButtonTexture);
+		Button->setTextSize(50);
+		Button->getRenderer()->setTextColorHover({ 180, 180, 180, 255 });
+		Button->getRenderer()->setTextColorDown({ 70, 70, 70, 255 });
 		Button->onPress([this, Selection] {this->Selection = Selection; });
 		Layout->add(Button);
 	}

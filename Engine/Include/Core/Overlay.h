@@ -8,7 +8,8 @@ enum class OverlaySelection
 {
 	Resume,
 	Restart,
-	MainMenu,
+	Main_Menu,
+	Toggle_Fullscreen,
 	Quit
 };
 
@@ -24,6 +25,7 @@ public:
 private:
 	std::optional<OverlaySelection> Selection;
 	tgui::Group::Ptr Group;
+	tgui::Texture ButtonTexture;
 
 private:
 	void InitBackground();

@@ -27,6 +27,7 @@ private:
 	Scene* CurrentScene;
 
 	bool CursorVisible;
+	bool Fullscreen;
 	Overlay PauseMenu;
 
 	friend EngineVisitor;
@@ -42,6 +43,7 @@ private:
 	void EventChangeScene(const std::string& SceneName);
 	void EventRestartScene();
 	void EventReturnToMainMenu();
+	void EventToggleFullscreen();
 	void EventPauseMenuToggle();
 	void EventPauseMenuSelection(OverlaySelection Selection);
 };

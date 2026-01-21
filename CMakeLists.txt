@@ -15,10 +15,12 @@ FetchContent_MakeAvailable(sfml json logs tgui enum)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Source/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Games/Source/*.cpp
 )
 
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Include/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Games/Include/*.h
 )
 
 add_executable(Arcade
@@ -32,6 +34,7 @@ set_target_properties(Arcade PROPERTIES
 
 target_include_directories(Arcade PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Include
+    ${CMAKE_CURRENT_SOURCE_DIR}/Games/Include
 )
 
 target_compile_features(Arcade PRIVATE cxx_std_20)
