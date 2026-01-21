@@ -17,6 +17,7 @@ public:
 	void Render();
 
 	bool IsRunning() const;
+	bool HasFocus() const;
 
 
 private:

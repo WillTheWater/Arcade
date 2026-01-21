@@ -74,6 +74,11 @@ bool Engine::IsRunning() const
 	return GameWindow.isOpen();
 }
 
+bool Engine::HasFocus() const
+{
+	return GameWindow.hasFocus();
+}
+
 void Engine::Calculate()
 {
 	ScreenSize = sf::Vector2f(sf::VideoMode::getDesktopMode().size);

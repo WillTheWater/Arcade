@@ -1,4 +1,5 @@
 #include <SFML/GpuPreference.hpp>
+#include <SFML/System/Sleep.hpp>
 
 #include "Core/Engine.h"
 
@@ -10,6 +11,11 @@ int main()
     while (GameEngine.IsRunning())
     {
         GameEngine.ProcessEvents();
+        if (!GameEngine.HasFocus())
+        {
+            sf::sleep(sf::microseconds(10));
+            continue;
+        }
         GameEngine.Update();
         GameEngine.Render();
     }
