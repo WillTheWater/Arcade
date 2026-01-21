@@ -30,9 +30,14 @@ private:
 	bool Fullscreen;
 	Overlay PauseMenu;
 
+	sf::Vector2f ScreenSize;
+	sf::Vector2f ScreenCenter;
+	float ScaleFactor;
+
 	friend EngineVisitor;
 
 private:
+	void Calculate();
 	void EventWindowClose();
 	void EventWindowResized(sf::Vector2u Size);
 	void EventWindowFocusLost();

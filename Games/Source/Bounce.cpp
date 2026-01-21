@@ -35,13 +35,8 @@ void Bounce::Game::InitStats()
 
 void Bounce::Game::InitBackground()
 {
-	auto X = (float)sf::VideoMode::getDesktopMode().size.x;
-	auto Y = (float)sf::VideoMode::getDesktopMode().size.y;
-	auto Pos = sf::Vector2f({ X,Y }).componentWiseMul({ 0.5f, 0.5f });
 	Background.setTexture(MGR.Assets.GetTexture(BACKGROUND_TEXTURE_FILENAME));
 	Background.setSize(EConfig.WindowSize);
-	Background.setOrigin(Background.getGeometricCenter());
-	Background.setPosition(Pos);
 }
 
 void Bounce::Game::InitBounceSound()

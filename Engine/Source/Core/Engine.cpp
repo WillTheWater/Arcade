@@ -17,7 +17,7 @@ Engine::Engine()
 	Manager.Audio.SetGlobalVolume(EConfig.GlobalVolume);
 	GameWindow.setKeyRepeatEnabled(false);
 	GameWindow.setMouseCursorVisible(false);
-
+	Calculate();
 	Manager.Scene.ChangeScene("Bounce");
 }
 
@@ -57,7 +57,13 @@ void Engine::Render()
 	GameWindow.clear(sf::Color::Black);
 	Manager.Renderer.BeginDrawing();
 	CurrentScene->Render();
-	GameWindow.draw(sf::Sprite(Manager.Renderer.FinishDrawing()));
+
+	auto RenderedScene = sf::Sprite(Manager.Renderer.FinishDrawing());
+	RenderedScene.setScale({ ScaleFactor, ScaleFactor });
+	RenderedScene.setOrigin({ RenderedScene.getTexture().getSize().x / 2.f, RenderedScene.getTexture().getSize().y / 2.f });
+	RenderedScene.setPosition(ScreenCenter);
+
+	GameWindow.draw(RenderedScene);
 	Manager.GUI.Render();
 	Manager.Cursor.Render();
 	GameWindow.display();
@@ -68,6 +74,13 @@ bool Engine::IsRunning() const
 	return GameWindow.isOpen();
 }
 
+void Engine::Calculate()
+{
+	ScreenSize = sf::Vector2f(sf::VideoMode::getDesktopMode().size);
+	ScreenCenter = sf::Vector2f(ScreenSize.x / 2.f, ScreenSize.y / 2.f);
+	ScaleFactor = 1080 / EConfig.WindowSize.x;
+}
+
 void Engine::EventWindowClose()
 {
 	GameWindow.close();
@@ -76,21 +89,16 @@ void Engine::EventWindowClose()
 
 void Engine::EventWindowResized(sf::Vector2u Size)
 {
-	LOG("Num: {}", Manager.Randomizer.Random(1, 10));
-	LOG("Num: {}", Manager.Randomizer.Random(1.f, (float)Size.y));
-	LOG("Bool: {}", Manager.Randomizer.Random());
 }
 
 void Engine::EventWindowFocusLost()
 {
 	CurrentScene->OnPause(true);
-	LOG("Window Focus Lost!");
 }
 
 void Engine::EventWindowFocusGained()
 {
 	CurrentScene->OnPause(PauseMenu.IsVisible());
-	LOG("Window Focus Gained!");
 }
 
 void Engine::EventScreenshot() const
