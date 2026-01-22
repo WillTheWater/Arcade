@@ -1,11 +1,11 @@
 {
   "WindowTitle": "Arcade",
-  "WindowSize": [ 600, 900 ],
+  "WindowSize": [ 1080, 1080 ],
   "DisableSFMLLogging": true,
   "MaxDeltaTime": 0.02,
-  "GlobalVolume": 100,
+  "GlobalVolume": 0,
   "BackgroundColor": [ 255, 255, 255 ],
-  "CursorRadius": 5,
+  "CursorSize": [ 50, 50],
   "CursorSpeed": 1200,
   "CursorColor": [ 255, 255, 255 ],
   "JoystickDeadZone": 0.1

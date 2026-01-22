@@ -1,6 +1,8 @@
 #pragma once
 
 #include <sfml/Graphics/CircleShape.hpp>
+#include <sfml/Graphics/RectangleShape.hpp>
+#include <sfml/Graphics/Texture.hpp>
 #include <sfml/Graphics/RenderWindow.hpp>
 #include <sfml/Graphics/View.hpp>
 
@@ -21,7 +23,9 @@ public:
 
 private:
 	sf::RenderWindow& Window;
-	sf::CircleShape CursorShape;
+	//sf::CircleShape CursorShape;
+	sf::Texture CursorTexture;
+	sf::RectangleShape Cursorbase;
 	float CursorSpeed;
 	bool Visible;
 

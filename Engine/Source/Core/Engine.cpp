@@ -3,13 +3,12 @@
 #include "Utilities/Log.h"
 
 Engine::Engine()
-	: GameWindow{ sf::VideoMode::getDesktopMode(), EConfig.WindowTitle, sf::Style::None, sf::State::Windowed}
+	: GameWindow{ sf::VideoMode(sf::Vector2u(EConfig.WindowSize)), EConfig.WindowTitle, sf::Style::None, sf::State::Windowed}
 	, Manager{GameWindow}
 	, Scenes{SceneFactory::CreateScenes(Manager)}
 	, CurrentScene{nullptr}
 	, PauseMenu{Manager.GUI}
 	, CursorVisible{true}
-	, Fullscreen{true}
 {
 	GameWindow.setVerticalSyncEnabled(true);
 	GameWindow.setIcon(sf::Image("Content/Assets/Textures/icon.png"));
@@ -18,7 +17,6 @@ Engine::Engine()
 	Manager.Audio.SetGlobalVolume(EConfig.GlobalVolume);
 	GameWindow.setKeyRepeatEnabled(false);
 	GameWindow.setMouseCursorVisible(false);
-	Calculate();
 
 	// =================== GAME =============================
 	//Manager.Scene.ChangeScene("Bounce");
@@ -61,13 +59,7 @@ void Engine::Render()
 	GameWindow.clear(sf::Color::Black);
 	Manager.Renderer.BeginDrawing();
 	CurrentScene->Render();
-
-	auto RenderedScene = sf::Sprite(Manager.Renderer.FinishDrawing());
-	RenderedScene.setScale({ ScaleFactor, ScaleFactor });
-	RenderedScene.setOrigin({ RenderedScene.getTexture().getSize().x / 2.f, RenderedScene.getTexture().getSize().y / 2.f });
-	RenderedScene.setPosition(ScreenCenter);
-
-	GameWindow.draw(RenderedScene);
+	GameWindow.draw(sf::Sprite(Manager.Renderer.FinishDrawing()));
 	Manager.GUI.Render();
 	Manager.Cursor.Render();
 	GameWindow.display();
@@ -81,13 +73,6 @@ bool Engine::IsRunning() const
 bool Engine::HasFocus() const
 {
 	return GameWindow.hasFocus();
-}
-
-void Engine::Calculate()
-{
-	ScreenSize = sf::Vector2f(sf::VideoMode::getDesktopMode().size);
-	ScreenCenter = sf::Vector2f(ScreenSize.x / 2.f, ScreenSize.y / 2.f);
-	ScaleFactor = 1080 / EConfig.WindowSize.x;
 }
 
 void Engine::EventWindowClose()
@@ -156,23 +141,6 @@ void Engine::EventReturnToMainMenu()
 	Manager.Cursor.SetCursorSpeed(EConfig.CursorSpeed);
 }
 
-void Engine::EventToggleFullscreen()
-{
-	auto Desktop = sf::VideoMode::getDesktopMode();
-	sf::Vector2u ScreenSize = Desktop.size;
-	if (Fullscreen)
-	{
-		GameWindow.setSize(ScreenSize / 2u);
-		GameWindow.setPosition((sf::Vector2i)ScreenSize / 4);
-	}
-	else
-	{
-		GameWindow.setSize(ScreenSize);
-		GameWindow.setPosition({ 0,0 });
-	}
-	Fullscreen = !Fullscreen;
-}
-
 void Engine::EventPauseMenuToggle()
 {
 	const bool Visibility = !PauseMenu.IsVisible();
@@ -198,9 +166,6 @@ void Engine::EventPauseMenuSelection(OverlaySelection Selection)
 		break;
 	case OverlaySelection::Main_Menu:
 		EventReturnToMainMenu();
-		break;
-	case OverlaySelection::Toggle_Fullscreen:
-		EventToggleFullscreen();
 		break;
 	case OverlaySelection::Quit:
 		EventWindowClose();

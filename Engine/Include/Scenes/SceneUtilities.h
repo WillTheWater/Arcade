@@ -16,7 +16,7 @@
 
 inline const sf::Font& GetDefaultFont()
 {
-	static const sf::Font Font("Content/Assets/Fonts/bulb.ttf");
+	static const sf::Font Font("Content/Assets/Fonts/gamefont.ttf");
 	return Font;
 }
 

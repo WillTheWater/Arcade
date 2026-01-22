@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <memory>
+#include <span>
 
 #include "Graphics/PostProcess.h"
 
@@ -12,6 +13,7 @@ public:
 	RenderManager();
 
 	void Draw(const sf::Drawable& Drawable);
+	void Draw(std::span<sf::Vertex> Vertices, sf::PrimitiveType Type);
 	void SetView(const sf::View& View);
 	void ResetView();
 

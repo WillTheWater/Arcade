@@ -9,7 +9,6 @@ enum class OverlaySelection
 	Resume,
 	Restart,
 	Main_Menu,
-	Toggle_Fullscreen,
 	Quit
 };
 

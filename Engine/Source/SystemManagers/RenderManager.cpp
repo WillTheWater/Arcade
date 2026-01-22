@@ -8,11 +8,11 @@
 //#include "Graphics/Effects/Invert.h"
 //#include "Graphics/Effects/Glitch.h"
 //#include "Graphics/Effects/Bloom.h"
-#include "Graphics/Effects/CRT.h"
+//#include "Graphics/Effects/CRT.h"
 
 RenderManager::RenderManager()
 	: RenderTarget{ sf::Vector2u(EConfig.WindowSize) }
-	, BackgroundTexture{"Content/Assets/Textures/Background.png"}
+	, BackgroundTexture{"Content/Assets/Textures/gamewindow.png"}
 	, Background{ EConfig.WindowSize }
 {
 	RenderTarget.setSmooth(true);
@@ -23,7 +23,7 @@ RenderManager::RenderManager()
 	{
 		ASSERT(PPETarget.resize(sf::Vector2u(EConfig.WindowSize)));
 
-		PostProcessEffects.emplace_back(std::make_unique<CRT>());
+		//PostProcessEffects.emplace_back(std::make_unique<CRT>());
 		//PostProcessEffects.emplace_back(std::make_unique<Bloom>());
 	}
 }
@@ -31,6 +31,11 @@ RenderManager::RenderManager()
 void RenderManager::Draw(const sf::Drawable& Drawable)
 {
 	RenderTarget.draw(Drawable);
+}
+
+void RenderManager::Draw(std::span<sf::Vertex> Vertices, sf::PrimitiveType Type)
+{
+	RenderTarget.draw(Vertices.data(), Vertices.size(), Type);
 }
 
 void RenderManager::SetView(const sf::View& View)

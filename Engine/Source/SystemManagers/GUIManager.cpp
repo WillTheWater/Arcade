@@ -7,7 +7,7 @@ GUIManager::GUIManager(sf::RenderWindow& Window)
 {
 	tgui::Theme::setDefault("Content/Themes/Dark.txt");
 	GUI.setTabKeyUsageEnabled(true);
-	GUI.setFont("Content/Assets/Fonts/bulb.ttf");
+	GUI.setFont("Content/Assets/Fonts/base.ttf");
 }
 
 void GUIManager::HandleEvents(const sf::Event& Event)

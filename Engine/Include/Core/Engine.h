@@ -2,8 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "Core/EngineVisitor.h"
 #include "Core/Managers.h"
+#include "Core/EngineVisitor.h"
 #include "Scenes/SceneFactory.h"
 #include "Core/Overlay.h"
 
@@ -21,6 +21,8 @@ public:
 
 
 private:
+	friend EngineVisitor;
+
 	sf::RenderWindow GameWindow;
 	Managers Manager;
 	
@@ -28,17 +30,9 @@ private:
 	Scene* CurrentScene;
 
 	bool CursorVisible;
-	bool Fullscreen;
 	Overlay PauseMenu;
 
-	sf::Vector2f ScreenSize;
-	sf::Vector2f ScreenCenter;
-	float ScaleFactor;
-
-	friend EngineVisitor;
-
 private:
-	void Calculate();
 	void EventWindowClose();
 	void EventWindowResized(sf::Vector2u Size);
 	void EventWindowFocusLost();
@@ -49,7 +43,6 @@ private:
 	void EventChangeScene(const std::string& SceneName);
 	void EventRestartScene();
 	void EventReturnToMainMenu();
-	void EventToggleFullscreen();
 	void EventPauseMenuToggle();
 	void EventPauseMenuSelection(OverlaySelection Selection);
 };

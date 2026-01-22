@@ -19,16 +19,22 @@ void Clicker::Game::InitStats()
 {
 	ClickStats.ScoreText.setFillColor(STATS_SCORE_TEXT_COLOR);
 	ClickStats.ScoreText.setCharacterSize(STATS_TEXT_SIZE);
-	ClickStats.ScoreText.setPosition({ 5,5 });
+	ClickStats.ScoreText.setPosition({ 25, 25 });
+	ClickStats.ScoreText.setOutlineColor(OUTLINE_COLOR);
+	ClickStats.ScoreText.setOutlineThickness(OUTLINE_THICKNESS);
 
 	ClickStats.FinalCooldown.SetDuration(STATS_FINAL_COOLDOWN_DURATION);
 	ClickStats.FinalCooldownText.setFillColor(STATS_FINAL_COOLDOWN_TEXT_COLOR);
 	ClickStats.FinalCooldownText.setCharacterSize(STATS_TEXT_SIZE);
-	ClickStats.FinalCooldownText.setPosition({ 5,50 });
+	ClickStats.FinalCooldownText.setPosition({ 25,75 });
+	ClickStats.FinalCooldownText.setOutlineColor(OUTLINE_COLOR);
+	ClickStats.FinalCooldownText.setOutlineThickness(OUTLINE_THICKNESS);
 
 	ClickStats.BestTimeText.setFillColor(STATS_BEST_TIME_TEXT_COLOR);
 	ClickStats.BestTimeText.setCharacterSize(STATS_TEXT_SIZE);
-	ClickStats.BestTimeText.setPosition({ 5,95 });
+	ClickStats.BestTimeText.setPosition({ 25,125 });
+	ClickStats.BestTimeText.setOutlineColor(OUTLINE_COLOR);
+	ClickStats.BestTimeText.setOutlineThickness(OUTLINE_THICKNESS);
 }
 
 void Clicker::Game::Start()
@@ -121,8 +127,9 @@ void Clicker::Game::EventTargetClicked()
 
 void Clicker::Game::EventTargetTeleport()
 {
-	sf::Vector2f HalfSize = ClickTarget.Shape.getGlobalBounds().size / 2.f;
-	ClickTarget.Shape.setPosition(MGR.Randomizer.Random(HalfSize, EConfig.WindowSize - HalfSize));
+	auto Min = sf::Vector2f({ ClickTarget.Shape.getGlobalBounds().size.x, EConfig.WindowSize.y * 0.25f });
+	auto Max = sf::Vector2f({ EConfig.WindowSize.x - ClickTarget.Shape.getGlobalBounds().size.x, EConfig.WindowSize.y - ClickTarget.Shape.getGlobalBounds().size.y });
+	ClickTarget.Shape.setPosition(MGR.Randomizer.Random(Min, Max ));
 }
 
 void Clicker::Game::EventStatsScoreIncrease()

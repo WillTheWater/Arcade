@@ -7,13 +7,13 @@
 
 CursorManager::CursorManager(sf::RenderWindow& Window)
 	: Window{ Window }
-	, CursorShape{ EConfig.CursorRadius }
+	, Cursorbase{EConfig.CursorSize}
 	, CursorSpeed{ EConfig.CursorSpeed }
 	, Visible{ true }
 {
-	CursorShape.setFillColor(EConfig.CursorColor);
-	CursorShape.setOrigin(CursorShape.getGeometricCenter());
-	CursorShape.setPosition(EConfig.WindowSize / 2.f);
+	CursorTexture.loadFromFile("Content/Assets/Textures/cursor.png");
+	Cursorbase.setTexture(&CursorTexture);
+	Cursorbase.setPosition(EConfig.WindowSize / 2.f);
 }
 
 void CursorManager::Update(float DeltaTime)
@@ -24,19 +24,19 @@ void CursorManager::Update(float DeltaTime)
 
 	if (JoystickDirection.length() > EConfig.JoystickDeadZone)
 	{
-		CursorShape.move(JoystickDirection * CursorSpeed * DeltaTime);
-		CursorShape.setPosition(
+		Cursorbase.move(JoystickDirection * CursorSpeed * DeltaTime);
+		Cursorbase.setPosition(
 			{
-				std::clamp(CursorShape.getPosition().x, 0.f,
+				std::clamp(Cursorbase.getPosition().x, 0.f,
 				EConfig.WindowSize.x - 1),
-				std::clamp(CursorShape.getPosition().y, 0.f,
+				std::clamp(Cursorbase.getPosition().y, 0.f,
 				EConfig.WindowSize.y - 1)
 			});
-		SetPosition(CursorShape.getPosition());
+		SetPosition(Cursorbase.getPosition());
 	}
 	else
 	{
-		CursorShape.setPosition(GetPosition());
+		Cursorbase.setPosition(GetPosition());
 	}
 }
 
@@ -44,7 +44,7 @@ void CursorManager::Render() const
 {
 	if (Visible)
 	{
-		Window.draw(CursorShape);
+		Window.draw(Cursorbase);
 	}
 }
 

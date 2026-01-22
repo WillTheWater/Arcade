@@ -7,7 +7,7 @@ void AudioManager::SetGlobalVolume(float Volume)
 	sf::Listener::setGlobalVolume(Volume);
 }
 
-float AudioManager::GetGlobalColume() const
+float AudioManager::GetGlobalVolume() const
 {
 	return sf::Listener::getGlobalVolume();
 }
