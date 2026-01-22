@@ -3,6 +3,7 @@
 // ============================================================================
 //                                   GAMES
 								#include "Bounce.h"
+								#include "Clicker.h"
 // ============================================================================
 
 namespace SceneFactory
@@ -12,6 +13,7 @@ namespace SceneFactory
 		Scenes SceneList;
 
 		SceneList.emplace("Bounce", std::make_unique<Bounce::Game>(Manager));
+		SceneList.emplace("Clicker", std::make_unique<Clicker::Game>(Manager));
 
 		return SceneList;
 	}

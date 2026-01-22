@@ -11,14 +11,18 @@ Engine::Engine()
 	, CursorVisible{true}
 	, Fullscreen{true}
 {
+	GameWindow.setVerticalSyncEnabled(true);
 	GameWindow.setIcon(sf::Image("Content/Assets/Textures/icon.png"));
-	GameWindow.setMinimumSize(sf::VideoMode::getDesktopMode().size / 4u);
+	GameWindow.setMinimumSize(GameWindow.getSize() / 2u);
 	if (EConfig.DisableSFMLLogging) { sf::err().rdbuf(nullptr); }
 	Manager.Audio.SetGlobalVolume(EConfig.GlobalVolume);
 	GameWindow.setKeyRepeatEnabled(false);
 	GameWindow.setMouseCursorVisible(false);
 	Calculate();
-	Manager.Scene.ChangeScene("Bounce");
+
+	// =================== GAME =============================
+	//Manager.Scene.ChangeScene("Bounce");
+	Manager.Scene.ChangeScene("Clicker");
 }
 
 void Engine::ProcessEvents()
@@ -175,7 +179,7 @@ void Engine::EventPauseMenuToggle()
 	PauseMenu.SetVisible(Visibility);
 
 	const bool CursorVisibility = Manager.Cursor.IsVisible();
-	Manager.Cursor.SetVisibility(Visibility || CursorVisibility);
+	Manager.Cursor.SetVisibility(Visibility || CursorVisible);
 	CursorVisible = CursorVisibility;
 
 	CurrentScene->OnPause(Visibility);
