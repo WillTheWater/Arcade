@@ -4,6 +4,7 @@
 
 #include "Core/Managers.h"
 #include "Core/EngineVisitor.h"
+#include "Core/WindowController.h"
 #include "Scenes/SceneFactory.h"
 #include "Core/Overlay.h"
 
@@ -31,6 +32,7 @@ private:
 
 	bool CursorVisible;
 	Overlay PauseMenu;
+	WindowControls WindowControl;
 
 private:
 	void EventWindowClose();

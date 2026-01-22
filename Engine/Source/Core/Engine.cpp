@@ -8,6 +8,7 @@ Engine::Engine()
 	, Scenes{SceneFactory::CreateScenes(Manager)}
 	, CurrentScene{nullptr}
 	, PauseMenu{Manager.GUI}
+	, WindowControl{ Manager }
 	, CursorVisible{true}
 {
 	GameWindow.setVerticalSyncEnabled(true);
@@ -17,10 +18,11 @@ Engine::Engine()
 	Manager.Audio.SetGlobalVolume(EConfig.GlobalVolume);
 	GameWindow.setKeyRepeatEnabled(false);
 	GameWindow.setMouseCursorVisible(false);
+	GameWindow.setMouseCursorGrabbed(true);
 
 	// =================== GAME =============================
 	//Manager.Scene.ChangeScene("Bounce");
-	Manager.Scene.ChangeScene("Clicker");
+	Manager.Scene.ChangeScene("MainMenu");
 }
 
 void Engine::ProcessEvents()
@@ -33,6 +35,7 @@ void Engine::ProcessEvents()
 	{
 		Event->visit(EngineVisitor{ *this });
 		Manager.GUI.HandleEvents(*Event);
+		WindowControl.OnEvent(*Event);
 		if (!PauseMenu.IsVisible())
 		{
 			CurrentScene->OnEvent(*Event);
@@ -48,6 +51,7 @@ void Engine::Update()
 {
 	Manager.Timer.Tick();
 	Manager.Cursor.Update(Manager.Timer.GetDeltaTime());
+	WindowControl.Update();
 	if (!PauseMenu.IsVisible())
 	{
 		CurrentScene->Update();
@@ -59,6 +63,7 @@ void Engine::Render()
 	GameWindow.clear(sf::Color::Black);
 	Manager.Renderer.BeginDrawing();
 	CurrentScene->Render();
+	WindowControl.Render();
 	GameWindow.draw(sf::Sprite(Manager.Renderer.FinishDrawing()));
 	Manager.GUI.Render();
 	Manager.Cursor.Render();

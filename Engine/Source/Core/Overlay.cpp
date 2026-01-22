@@ -36,7 +36,7 @@ void Overlay::InitBackground()
 
 void Overlay::InitButtons()
 {
-	ButtonTexture.load("Content/Assets/Textures/button.png");
+	ButtonTexture.load("Content/Assets/Textures/button2.png");
 	auto Layout = tgui::VerticalLayout::create();
 	Layout->setSize("37%", "43%");
 	Layout->setPosition("32%", "18%");
