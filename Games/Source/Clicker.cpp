@@ -175,3 +175,29 @@ void Clicker::Game::OnPause(bool Paused)
 		ClickStats.FinalCooldown.Start();
 	}
 }
+
+void Clicker::Game::OnEvent(const sf::Event& event)
+{
+	event.visit([this](const auto& type) { this->HandleEvent(type); });
+}
+
+void Clicker::Game::HandleEvent(const sf::Event::TextEntered&)
+{
+
+}
+void Clicker::Game::HandleEvent(const sf::Event::KeyPressed&)
+{
+
+}
+void Clicker::Game::HandleEvent(const sf::Event::JoystickButtonPressed&)
+{
+
+}
+void Clicker::Game::HandleEvent(const sf::Event::MouseButtonPressed&)
+{
+
+}
+void Clicker::Game::HandleEvent(const sf::Event::MouseWheelScrolled&)
+{
+
+}
