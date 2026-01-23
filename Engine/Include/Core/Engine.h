@@ -34,9 +34,15 @@ private:
 	Overlay PauseMenu;
 	WindowControls WindowControl;
 
+	bool Maximized;
+	sf::Vector2u PrevSize;
+	sf::Vector2i PrevPos;
+
 private:
 	void EventWindowClose();
 	void EventWindowResized(sf::Vector2u Size);
+	void EventWindowMaximize();
+	void EventWindowMinimize();
 	void EventWindowFocusLost();
 	void EventWindowFocusGained();
 	void EventScreenshot() const;
@@ -47,4 +53,5 @@ private:
 	void EventReturnToMainMenu();
 	void EventPauseMenuToggle();
 	void EventPauseMenuSelection(OverlaySelection Selection);
+	void EventWindowAction();
 };

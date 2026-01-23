@@ -4,16 +4,25 @@
 #include <sfml/Window/Event.hpp>
 #include <sfml/System/Vector2.hpp>
 #include <vector>
+#include <functional>
 
 #include "Core/Managers.h"
 #include "Scenes/SceneUtilities.h"
 
+enum class WindowAction
+{
+    Close,
+    Maximize,
+    Minimize
+};
+
 struct Button
 {
 	sf::RectangleShape Shape;
-    int ButtonIndex;
+    std::function<void()> OnClick;
 };
 
+using ActionCallback = std::function<void(WindowAction)>;
 const sf::Vector2f BUTTON_SIZE{ 35.f, 35.f };
 const sf::Vector2f BUTTON_SPACING{ 10,0 };
 const float BUTTON_DISTANCE_FROM_SIDE{ 40.f };
@@ -31,13 +40,17 @@ public:
     void Update();
     void Render() const;
 
+    void SetActionCallback(ActionCallback cb);
+    std::vector<Button> GetButtons() const { return Buttons; }
+
 private:
     Managers& MGR;
     std::vector<Button> Buttons;
+    ActionCallback OnAction;
 
 private:
     void InitButtons();
-    void InitButton(Button& ButtonToInit, sf::FloatRect Bounds, std::string PATH, int INDEX);
+    void InitButton(Button& ButtonToInit, sf::FloatRect Bounds, std::string PATH);
 
     void HandleEvent(const sf::Event::MouseButtonPressed&);
     void HandleEvent(const sf::Event::JoystickButtonPressed&);

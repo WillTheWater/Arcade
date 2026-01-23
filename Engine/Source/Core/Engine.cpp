@@ -1,3 +1,9 @@
+#ifdef _WIN32
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#endif
+
 #include "Core/Engine.h"
 #include "Core/EngineConfig.h"
 #include "Utilities/Log.h"
@@ -10,6 +16,7 @@ Engine::Engine()
 	, PauseMenu{Manager.GUI}
 	, WindowControl{ Manager }
 	, CursorVisible{true}
+	, Maximized{false}
 {
 	GameWindow.setVerticalSyncEnabled(true);
 	GameWindow.setIcon(sf::Image("Content/Assets/Textures/icon.png"));
@@ -18,10 +25,10 @@ Engine::Engine()
 	Manager.Audio.SetGlobalVolume(EConfig.GlobalVolume);
 	GameWindow.setKeyRepeatEnabled(false);
 	GameWindow.setMouseCursorVisible(false);
-	GameWindow.setMouseCursorGrabbed(true);
+	//GameWindow.setMouseCursorGrabbed(true);
+	EventWindowAction();
 
 	// =================== GAME =============================
-	//Manager.Scene.ChangeScene("Bounce");
 	Manager.Scene.ChangeScene("MainMenu");
 }
 
@@ -83,20 +90,60 @@ bool Engine::HasFocus() const
 void Engine::EventWindowClose()
 {
 	GameWindow.close();
-	LOG("Window Closed After: {:.2f} seconds", Manager.Timer.GetElapsedTime());
 }
 
 void Engine::EventWindowResized(sf::Vector2u Size)
 {
 }
 
+void Engine::EventWindowMaximize()
+{
+	auto desktop = sf::VideoMode::getDesktopMode();
+
+	LOG("Mouse Needs Fixed");
+	/*if (!Maximized)
+	{
+		PrevSize = GameWindow.getSize();
+		PrevPos = GameWindow.getPosition();
+
+		sf::Vector2u newSize = { std::min(desktop.size.x, desktop.size.y),
+								 std::min(desktop.size.x, desktop.size.y) };
+		GameWindow.setSize(newSize);
+		GameWindow.setPosition(
+			{
+				sf::Vector2i((desktop.size.x - newSize.x) / 2,
+				(desktop.size.y - newSize.y) / 2 )
+			});
+
+		Maximized = true;
+	}
+	else
+	{
+		GameWindow.setSize(PrevSize);
+		GameWindow.setPosition(PrevPos);
+
+		Maximized = false;
+	}*/
+}
+
+
+void Engine::EventWindowMinimize()
+{
+#ifdef _WIN32
+	HWND hwnd = static_cast<HWND>(GameWindow.getNativeHandle());
+	ShowWindow(hwnd, SW_MINIMIZE);
+#endif
+}
+
 void Engine::EventWindowFocusLost()
 {
+	LOG("LOST FOCUS");
 	CurrentScene->OnPause(true);
 }
 
 void Engine::EventWindowFocusGained()
 {
+	LOG("GAINED FOCUS");
 	CurrentScene->OnPause(PauseMenu.IsVisible());
 }
 
@@ -156,7 +203,7 @@ void Engine::EventPauseMenuToggle()
 	CursorVisible = CursorVisibility;
 
 	CurrentScene->OnPause(Visibility);
-	LOG(Visibility ? "Game Paused!" : "Game Unpaused!");
+	//LOG(Visibility ? "Game Paused!" : "Game Unpaused!");
 }
 
 void Engine::EventPauseMenuSelection(OverlaySelection Selection)
@@ -178,4 +225,20 @@ void Engine::EventPauseMenuSelection(OverlaySelection Selection)
 	default:
 		break;
 	}
+}
+
+void Engine::EventWindowAction()
+{
+	WindowControl.SetActionCallback
+	(
+		[this](WindowAction action)
+		{
+			switch (action)
+			{
+			case WindowAction::Close: EventWindowClose(); break;
+			case WindowAction::Maximize: EventWindowMaximize(); break;
+			case WindowAction::Minimize: EventWindowMinimize(); break;
+			}
+		}
+	);
 }

@@ -22,13 +22,15 @@ void WindowControls::InitButtons()
     {
         sf::Vector2f position{ start.x + step.x * -i, start.y };
         auto& button = Buttons.emplace_back();
-        InitButton(button, { position, BUTTON_SIZE }, FILE_PATH[i], i);
+        InitButton(button, { position, BUTTON_SIZE }, FILE_PATH[i]);
     }
+    Buttons[0].OnClick = [this] { if (OnAction) OnAction(WindowAction::Close); };
+    Buttons[1].OnClick = [this] { if (OnAction) OnAction(WindowAction::Maximize); };
+    Buttons[2].OnClick = [this] { if (OnAction) OnAction(WindowAction::Minimize); };
 }
 
-void WindowControls::InitButton(Button& ButtonToInit, sf::FloatRect Bounds, std::string PATH, int INDEX)
+void WindowControls::InitButton(Button& ButtonToInit, sf::FloatRect Bounds, std::string PATH)
 {
-    ButtonToInit.ButtonIndex = INDEX;
     ButtonToInit.Shape.setTexture(MGR.Assets.GetTexture(PATH));
     ButtonToInit.Shape.setFillColor(BUTTON_COLOR);
     ButtonToInit.Shape.setSize(Bounds.size);
@@ -38,21 +40,42 @@ void WindowControls::InitButton(Button& ButtonToInit, sf::FloatRect Bounds, std:
 
 void WindowControls::HandleEvent(const sf::Event::MouseButtonPressed& mouse)
 {
-    if (mouse.button == sf::Mouse::Button::Left)
+    if (mouse.button != sf::Mouse::Button::Left)
+        return;
+
+    for (auto& button : Buttons)
     {
-        // TODO
-        LOG("MOUSE PRESSED");
+        if (!IsButtonHovered(button))
+            continue;
+
+        if (button.OnClick)
+            button.OnClick();
+
+        return;
     }
+}
+
+void WindowControls::SetActionCallback(ActionCallback cb)
+{
+    OnAction = std::move(cb);
 }
 
 void WindowControls::HandleEvent(const sf::Event::JoystickButtonPressed& joystick)
 {
     if (auto button = Input::HardwareToLogic(joystick.button, joystick.joystickId))
     {
-        if (*button == GamepadButton::South)
+        if (*button != GamepadButton::South)
+            return;
+
+        for (auto& b : Buttons)
         {
-            // TODO
-            LOG("GAMEPAD PRESSED");
+            if (!IsButtonHovered(b))
+                continue;
+
+            if (b.OnClick)
+                b.OnClick();
+
+            return;
         }
     }
 }
