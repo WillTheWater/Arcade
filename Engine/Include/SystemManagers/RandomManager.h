@@ -14,7 +14,7 @@ public:
     bool Random(double Probablity = 0.5);
     sf::Vector2f Random(sf::Vector2f Min, sf::Vector2f Max);
     sf::Angle Random(sf::Angle Min, sf::Angle Max);
-    sf::Color Random(sf::Color Min, sf::Color Max, uint8_t Alpha);
+    sf::Color Random(sf::Color Min, sf::Color Max, uint8_t Alpha = 255);
 
 private:
     std::mt19937 Generator{ std::random_device{}() };
