@@ -1,7 +1,8 @@
 #include "Core/WindowController.h"
 
-WindowControls::WindowControls(Managers& Mgr)
+WindowControls::WindowControls(Managers& Mgr, sf::RenderWindow& window)
     : MGR{ Mgr }
+    , GameWindow{window}
 {
     InitButtons();
 }
@@ -46,8 +47,36 @@ void WindowControls::InitButton(Button& button, sf::FloatRect bounds, const std:
 */
 void WindowControls::HandleEvent(const sf::Event::MouseMoved&)
 {
+    // Handle maximize-drag detection
+    if (bMaximizeDragCandidate && !bDraggingWindow)
+    {
+        sf::Vector2i currentMousePos = sf::Mouse::getPosition();
+        sf::Vector2i delta = currentMousePos - DragStartMousePos;
+
+        float distance =
+            std::sqrt(static_cast<float>(delta.x * delta.x + delta.y * delta.y));
+
+        if (distance >= MAX_DRAG_THRESHOLD)
+        {
+            bDraggingWindow = true;
+
+            // Cancel maximize click
+            Buttons[1].bPressed = false;
+        }
+    }
+
+    // Perform window dragging
+    if (bDraggingWindow)
+    {
+        sf::Vector2i currentMousePos = sf::Mouse::getPosition();
+        GameWindow.setPosition(
+            DragStartWindowPos + (currentMousePos - DragStartMousePos)
+        );
+    }
+
     UpdateButtons();
 }
+
 
 /*
     Mouse pressed:
@@ -59,13 +88,24 @@ void WindowControls::HandleEvent(const sf::Event::MouseButtonPressed& mouse)
     if (mouse.button != sf::Mouse::Button::Left)
         return;
 
-    for (auto& button : Buttons)
+    for (size_t i = 0; i < Buttons.size(); ++i)
     {
+        auto& button = Buttons[i];
+
         if (!IsButtonHovered(button))
             continue;
 
         button.bPressed = true;
         button.Shape.setFillColor(BUTTON_PRESSED_COLOR);
+
+        // Maximize button = index 1
+        if (i == 1)
+        {
+            bMaximizeDragCandidate = true;
+            DragStartMousePos = sf::Mouse::getPosition();
+            DragStartWindowPos = GameWindow.getPosition();
+        }
+
         return;
     }
 }
@@ -81,6 +121,14 @@ void WindowControls::HandleEvent(const sf::Event::MouseButtonReleased& mouse)
     if (mouse.button != sf::Mouse::Button::Left)
         return;
 
+    // End drag if it was active
+    if (bDraggingWindow)
+    {
+        bDraggingWindow = false;
+        bMaximizeDragCandidate = false;
+        return; // IMPORTANT: never trigger maximize after drag
+    }
+
     for (auto& button : Buttons)
     {
         if (!button.bPressed)
@@ -92,9 +140,13 @@ void WindowControls::HandleEvent(const sf::Event::MouseButtonReleased& mouse)
             button.OnClick();
 
         button.bPressed = false;
+        bMaximizeDragCandidate = false;
         return;
     }
+
+    bMaximizeDragCandidate = false;
 }
+
 
 /*
     Joystick support mirrors mouse logic:

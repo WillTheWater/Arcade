@@ -50,7 +50,7 @@ const std::array<std::string, 3> FILE_PATH =
 class WindowControls
 {
 public:
-    explicit WindowControls(Managers& Mgr);
+    explicit WindowControls(Managers& Mgr, sf::RenderWindow& window);
 
     void OnEvent(const sf::Event& event);
     void Update();
@@ -62,6 +62,16 @@ private:
     Managers& MGR;
     std::vector<Button> Buttons;
     ActionCallback OnAction;
+
+    // --- Maximize drag support ---
+    sf::RenderWindow& GameWindow;
+    static constexpr float MAX_DRAG_THRESHOLD = 6.f;
+
+    bool bDraggingWindow = false;
+    bool bMaximizeDragCandidate = false;
+
+    sf::Vector2i DragStartMousePos;
+    sf::Vector2i DragStartWindowPos;
 
 private:
     void InitButtons();

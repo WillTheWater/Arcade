@@ -14,7 +14,7 @@ Engine::Engine()
 	, Scenes{SceneFactory::CreateScenes(Manager)}
 	, CurrentScene{nullptr}
 	, PauseMenu{Manager.GUI}
-	, WindowControl{ Manager }
+	, WindowControl{ Manager, GameWindow }
 	, CursorVisible{true}
 	, Maximized{false}
 {
