@@ -47,6 +47,8 @@ void WindowControls::InitButton(Button& button, sf::FloatRect bounds, const std:
 */
 void WindowControls::HandleEvent(const sf::Event::MouseMoved&)
 {
+    MGR.Cursor.SetVisibility(true);
+    AutoHideCursor.Restart();
     // Handle maximize-drag detection
     if (bMaximizeDragCandidate && !bDraggingWindow)
     {
@@ -85,6 +87,7 @@ void WindowControls::HandleEvent(const sf::Event::MouseMoved&)
 */
 void WindowControls::HandleEvent(const sf::Event::MouseButtonPressed& mouse)
 {
+    if (!MGR.Cursor.IsVisible()) { return; }
     if (mouse.button != sf::Mouse::Button::Left)
         return;
 
@@ -118,6 +121,7 @@ void WindowControls::HandleEvent(const sf::Event::MouseButtonPressed& mouse)
 */
 void WindowControls::HandleEvent(const sf::Event::MouseButtonReleased& mouse)
 {
+    if (!MGR.Cursor.IsVisible()) { return; }
     if (mouse.button != sf::Mouse::Button::Left)
         return;
 
@@ -154,6 +158,7 @@ void WindowControls::HandleEvent(const sf::Event::MouseButtonReleased& mouse)
 */
 void WindowControls::HandleEvent(const sf::Event::JoystickButtonPressed& joystick)
 {
+    if (!MGR.Cursor.IsVisible()) { return; }
     if (auto button = Input::HardwareToLogic(joystick.button, joystick.joystickId))
     {
         if (*button != GamepadButton::South)
@@ -172,6 +177,7 @@ void WindowControls::HandleEvent(const sf::Event::JoystickButtonPressed& joystic
 
 void WindowControls::HandleEvent(const sf::Event::JoystickButtonReleased& joystick)
 {
+    if (!MGR.Cursor.IsVisible()) { return; }
     if (auto button = Input::HardwareToLogic(joystick.button, joystick.joystickId))
     {
         if (*button != GamepadButton::South)
@@ -203,6 +209,7 @@ void WindowControls::HandleEvent(const sf::Event::JoystickButtonReleased& joysti
 */
 void WindowControls::UpdateButtons()
 {
+    if (!MGR.Cursor.IsVisible()) { return; }
     for (auto& button : Buttons)
         UpdateButton(button);
 }
@@ -222,6 +229,7 @@ void WindowControls::UpdateButton(Button& button)
 
 bool WindowControls::IsButtonHovered(const Button& button) const
 {
+    if (!MGR.Cursor.IsVisible()) { return false; }
     return Contains(button.Shape, MGR.Cursor.GetPosition());
 }
 
@@ -240,6 +248,10 @@ void WindowControls::OnEvent(const sf::Event& event)
 
 void WindowControls::Update()
 {
+    if (AutoHideCursor.GetElapsedTime() > HideCursorTime)
+    {
+        MGR.Cursor.SetVisibility(false);
+    }
     UpdateButtons();
 }
 

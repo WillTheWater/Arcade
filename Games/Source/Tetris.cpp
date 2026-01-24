@@ -7,6 +7,8 @@ namespace Tetris
 		, ActionCooldown{ACTION_COOLDOWN_DURATION}
 		, FallCooldown{PIECE_FALL_COOLDOWN_DURATION}
 		, DropCooldown{SOFT_DROP_COOLDOWN_DURATION}
+		, StartCountdown{ START_COUNTDOWN_DURATION } // ADDED
+		, LevelTimer{ LEVEL_DURATION }               // ADDED
 	{
 		InitStats();
 	}
@@ -14,6 +16,8 @@ namespace Tetris
 	void Game::InitStats()
 	{
 		PlayerStats.ScoreText.setPosition({ 10,10 });
+		PlayerStats.HighScoreText.setPosition({ 10,40 }); // ADDED
+		PlayerStats.LevelText.setPosition({ 10,70 });     // ADDED
 	}
 
 	void Game::Start()
@@ -25,11 +29,12 @@ namespace Tetris
 		StartNextPiece();
 		StartStats();
 
-		EventPieceSpawn();
+		StartCountdown.Start(); // ADDED
+		HasStarted = false;
 
-		ActionCooldown.Restart();
-		FallCooldown.Restart();
-		DropCooldown.Restart();
+		ActionCooldown.Stop();
+		FallCooldown.Stop();
+		DropCooldown.Stop();
 	}
 
 	void Game::BindInput()
@@ -53,6 +58,29 @@ namespace Tetris
 
 	void Game::Update()
 	{
+		// ADDED: start countdown
+		if (!HasStarted)
+		{
+			if (StartCountdown.IsOver())
+			{
+				HasStarted = true;
+				EventPieceSpawn();
+				ActionCooldown.Restart();
+				FallCooldown.Restart();
+				DropCooldown.Restart();
+				LevelTimer.Restart();
+			}
+			return;
+		}
+
+		UpdateScoreOverTime(); // ADDED
+
+		if (LevelTimer.IsOver())
+		{
+			AdvanceLevel();
+			LevelTimer.Restart();
+		}
+
 		if (MGR.Input.Pressed(Rotate) && ActionCooldown.IsOver())
 		{
 			EventPieceRotate();
@@ -81,12 +109,32 @@ namespace Tetris
 		}
 	}
 
+	void Game::AdvanceLevel()
+	{
+		PlayerStats.Level++;
+		PlayerStats.LevelText.setString("Level: " + std::to_string(PlayerStats.Level));
+
+		FallCooldown.SetDuration(FallCooldown.GetDuration() * FALL_SPEED_MULTIPLIER);
+	}
+
+	void Game::UpdateScoreOverTime()
+	{
+		PlayerStats.Score += static_cast<int>(10 * MGR.Timer.GetDeltaTime());
+		PlayerStats.ScoreText.setString("Score: " + std::to_string(PlayerStats.Score));
+	}
+
 	void Game::Render() const
 	{
 		RenderBoard();
-		RenderPiece(CurrentPiece, GetBoardOrigin(), true);
-		RenderPiece(NextPiece, {EConfig.WindowSize.x -5.5f * BLOCK_SIZE, BLOCK_SIZE * 2.5f}, false);
+
+		if (HasStarted) // NEW
+		{
+			RenderPiece(CurrentPiece, GetBoardOrigin(), true);
+			RenderPiece(NextPiece, { EConfig.WindowSize.x - 5.5f * BLOCK_SIZE, BLOCK_SIZE * 2.5f }, false);
+		}
 		MGR.Renderer.Draw(PlayerStats.ScoreText);
+		MGR.Renderer.Draw(PlayerStats.HighScoreText);
+		MGR.Renderer.Draw(PlayerStats.LevelText);
 
 	}
 
@@ -115,12 +163,16 @@ namespace Tetris
 			ActionCooldown.Stop();
 			FallCooldown.Stop();
 			DropCooldown.Stop();
+			StartCountdown.Stop();
+			LevelTimer.Stop();
 		}
 		else
 		{
 			ActionCooldown.Start();
 			FallCooldown.Start();
 			DropCooldown.Start();
+			StartCountdown.Start();
+			LevelTimer.Start();
 		}
 	}
 
@@ -137,13 +189,21 @@ namespace Tetris
 	void Game::StartStats()
 	{
 		PlayerStats.Score = 0;
+		PlayerStats.Level = 1;
+
+		PlayerStats.HighScore =
+			MGR.Save.Get<int>(STATS_HIGHSCORE_KEY, 0); // ADDED
+
 		PlayerStats.ScoreText.setString("Score: 0");
+		PlayerStats.HighScoreText.setString("High: " + std::to_string(PlayerStats.HighScore));
+		PlayerStats.LevelText.setString("Level: 1");
 	}
 
 	void Game::EventPieceSpawn()
 	{
 		CurrentPiece = NextPiece;
 		NextPiece = GenerateRandomPiece();
+		HasStarted = true;
 	}
 
 	void Game::EventPieceRotate()
@@ -205,7 +265,11 @@ namespace Tetris
 		EventPieceSpawn();
 		if (!IsPieceValid(CurrentPiece))
 		{
-			// LOSE
+			// ADDED: save high score
+			if (PlayerStats.Score > PlayerStats.HighScore)
+			{
+				MGR.Save.Set(STATS_HIGHSCORE_KEY, PlayerStats.Score);
+			}
 			MGR.Scene.ReloadScene();
 		}
 	}

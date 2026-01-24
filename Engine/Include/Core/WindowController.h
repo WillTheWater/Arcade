@@ -62,6 +62,8 @@ private:
     Managers& MGR;
     std::vector<Button> Buttons;
     ActionCallback OnAction;
+    Timer AutoHideCursor;
+    const float HideCursorTime = 2.f;
 
     // --- Maximize drag support ---
     sf::RenderWindow& GameWindow;

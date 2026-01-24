@@ -22,6 +22,11 @@ namespace Tetris
 	struct Stats
 	{
 		int Score;
+		int HighScore = 0;              // ADDED
+		int Level = 1;                  // ADDED
+
 		sf::Text ScoreText{ GetDefaultFont() };
+		sf::Text HighScoreText{ GetDefaultFont() }; // ADDED
+		sf::Text LevelText{ GetDefaultFont() };     // ADDED
 	};
 }

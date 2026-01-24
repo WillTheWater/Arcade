@@ -20,6 +20,14 @@ namespace Tetris
 
 	const sf::Color GRID_COLOR(125, 125, 125);
 
+	// ADDED: countdown + level tuning
+	const float START_COUNTDOWN_DURATION = 3.f;
+	const float LEVEL_DURATION = 30.f;
+	const float FALL_SPEED_MULTIPLIER = 0.85f;
+
+	// ADDED: save key
+	const std::string_view STATS_HIGHSCORE_KEY = "TETRIS_HIGHSCORE";
+
 	const std::vector<std::vector<sf::Vector2i>> PIECE_SHAPES =
 	{
 		{{0,1},{1,1},{2,1},{3,1}},

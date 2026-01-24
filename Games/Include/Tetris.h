@@ -24,6 +24,12 @@ namespace Tetris
 		Timer FallCooldown;
 		Timer DropCooldown;
 
+		// ADDED: new timers
+		Timer StartCountdown;
+		Timer LevelTimer;
+
+		bool HasStarted = false; // ADDED
+
 	private:
 		void InitStats();
 		void BindInput();
@@ -39,6 +45,10 @@ namespace Tetris
 		void EventPieceDropHard();
 		void EventPieceMerge();
 		void EventLinesClear();
+
+		// ADDED
+		void AdvanceLevel();
+		void UpdateScoreOverTime();
 
 		Piece GenerateRandomPiece() const;
 		sf::Vector2i GetPointRotated(int Type, int Index, int Rotation) const;
