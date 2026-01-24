@@ -101,7 +101,7 @@ void Engine::EventWindowMaximize()
 	auto desktop = sf::VideoMode::getDesktopMode();
 
 	LOG("Mouse Needs Fixed");
-	/*if (!Maximized)
+	if (!Maximized)
 	{
 		PrevSize = GameWindow.getSize();
 		PrevPos = GameWindow.getPosition();
@@ -123,7 +123,7 @@ void Engine::EventWindowMaximize()
 		GameWindow.setPosition(PrevPos);
 
 		Maximized = false;
-	}*/
+	}
 }
 
 

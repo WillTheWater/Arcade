@@ -1,10 +1,12 @@
 #pragma once
 
-#include <SFML/Graphics/Color.hpp>
-#include <sfml/Window/Event.hpp>
-#include <sfml/System/Vector2.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/System/Vector2.hpp>
+
 #include <vector>
 #include <functional>
+#include <array>
 
 #include "Core/Managers.h"
 #include "Scenes/SceneUtilities.h"
@@ -16,32 +18,45 @@ enum class WindowAction
     Minimize
 };
 
+/*
+    Button state is now explicit.
+    This mirrors the reference implementation behavior.
+*/
 struct Button
 {
-	sf::RectangleShape Shape;
+    sf::RectangleShape Shape;
     std::function<void()> OnClick;
+
+    bool bPressed = false;   // True only while mouse is pressed down on THIS button
 };
 
 using ActionCallback = std::function<void(WindowAction)>;
-const sf::Vector2f BUTTON_SIZE{ 35.f, 35.f };
-const sf::Vector2f BUTTON_SPACING{ 10,0 };
-const float BUTTON_DISTANCE_FROM_SIDE{ 40.f };
+
+constexpr sf::Vector2f BUTTON_SIZE{ 35.f, 35.f };
+constexpr sf::Vector2f BUTTON_SPACING{ 10.f, 0.f };
+constexpr float BUTTON_DISTANCE_FROM_SIDE{ 40.f };
+
 const sf::Color BUTTON_COLOR(sf::Color::White);
 const sf::Color BUTTON_HOVERED_COLOR({ 180,180,180 });
-const std::array<std::string, 3> FILE_PATH = { "close.png" , "max.png" , "min.png" };
+const sf::Color BUTTON_PRESSED_COLOR({ 100,100,100 });
 
+const std::array<std::string, 3> FILE_PATH =
+{
+    "close.png",
+    "max.png",
+    "min.png"
+};
 
 class WindowControls
 {
 public:
-	WindowControls(Managers& Mgr);
+    explicit WindowControls(Managers& Mgr);
 
-    void OnEvent(const sf::Event&);
+    void OnEvent(const sf::Event& event);
     void Update();
     void Render() const;
 
     void SetActionCallback(ActionCallback cb);
-    std::vector<Button> GetButtons() const { return Buttons; }
 
 private:
     Managers& MGR;
@@ -50,13 +65,18 @@ private:
 
 private:
     void InitButtons();
-    void InitButton(Button& ButtonToInit, sf::FloatRect Bounds, std::string PATH);
+    void InitButton(Button& button, sf::FloatRect bounds, const std::string& path);
 
+    // --- Event handling ---
+    void HandleEvent(const sf::Event::MouseMoved&);
     void HandleEvent(const sf::Event::MouseButtonPressed&);
+    void HandleEvent(const sf::Event::MouseButtonReleased&);
     void HandleEvent(const sf::Event::JoystickButtonPressed&);
+    void HandleEvent(const sf::Event::JoystickButtonReleased&);
     void HandleEvent(const auto&) {}
 
+    // --- Button logic ---
     void UpdateButtons();
-    void UpdateButton(Button& ButtonToUpdate);
-    bool IsButtonHovered(const Button& ButtonHovered) const;
+    void UpdateButton(Button& button);
+    bool IsButtonHovered(const Button& button) const;
 };

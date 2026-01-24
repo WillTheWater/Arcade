@@ -1,9 +1,9 @@
 #include "Core/WindowController.h"
 
 WindowControls::WindowControls(Managers& Mgr)
-    : MGR {Mgr}
+    : MGR{ Mgr }
 {
-	InitButtons();
+    InitButtons();
 }
 
 void WindowControls::InitButtons()
@@ -11,33 +11,49 @@ void WindowControls::InitButtons()
     Buttons.reserve(3);
 
     sf::Vector2f start
-    { 
-        EConfig.WindowSize.x - BUTTON_DISTANCE_FROM_SIDE, 
-        BUTTON_DISTANCE_FROM_SIDE 
+    {
+        EConfig.WindowSize.x - BUTTON_DISTANCE_FROM_SIDE,
+        BUTTON_DISTANCE_FROM_SIDE
     };
 
-    sf::Vector2f step { BUTTON_SPACING + BUTTON_SIZE };
+    sf::Vector2f step{ BUTTON_SPACING + BUTTON_SIZE };
 
     for (int i = 0; i < 3; i++)
     {
-        sf::Vector2f position{ start.x + step.x * -i, start.y };
+        sf::Vector2f position{ start.x - step.x * i, start.y };
         auto& button = Buttons.emplace_back();
         InitButton(button, { position, BUTTON_SIZE }, FILE_PATH[i]);
     }
+
     Buttons[0].OnClick = [this] { if (OnAction) OnAction(WindowAction::Close); };
     Buttons[1].OnClick = [this] { if (OnAction) OnAction(WindowAction::Maximize); };
     Buttons[2].OnClick = [this] { if (OnAction) OnAction(WindowAction::Minimize); };
 }
 
-void WindowControls::InitButton(Button& ButtonToInit, sf::FloatRect Bounds, std::string PATH)
+void WindowControls::InitButton(Button& button, sf::FloatRect bounds, const std::string& path)
 {
-    ButtonToInit.Shape.setTexture(MGR.Assets.GetTexture(PATH));
-    ButtonToInit.Shape.setFillColor(BUTTON_COLOR);
-    ButtonToInit.Shape.setSize(Bounds.size);
-    ButtonToInit.Shape.setOrigin(ButtonToInit.Shape.getGeometricCenter());
-    ButtonToInit.Shape.setPosition(Bounds.position);
+    button.Shape.setTexture(MGR.Assets.GetTexture(path));
+    button.Shape.setFillColor(BUTTON_COLOR);
+    button.Shape.setSize(bounds.size);
+    button.Shape.setOrigin(button.Shape.getGeometricCenter());
+    button.Shape.setPosition(bounds.position);
 }
 
+/*
+    Mouse moved:
+    - Only affects visuals
+    - Pressed buttons do NOT change hover state
+*/
+void WindowControls::HandleEvent(const sf::Event::MouseMoved&)
+{
+    UpdateButtons();
+}
+
+/*
+    Mouse pressed:
+    - Only registers if mouse is inside button
+    - Sets pressed state but does NOT trigger click
+*/
 void WindowControls::HandleEvent(const sf::Event::MouseButtonPressed& mouse)
 {
     if (mouse.button != sf::Mouse::Button::Left)
@@ -48,18 +64,42 @@ void WindowControls::HandleEvent(const sf::Event::MouseButtonPressed& mouse)
         if (!IsButtonHovered(button))
             continue;
 
-        if (button.OnClick)
-            button.OnClick();
-
+        button.bPressed = true;
+        button.Shape.setFillColor(BUTTON_PRESSED_COLOR);
         return;
     }
 }
 
-void WindowControls::SetActionCallback(ActionCallback cb)
+/*
+    Mouse released:
+    - Click fires ONLY if:
+        - Button was pressed
+        - Mouse is still inside
+*/
+void WindowControls::HandleEvent(const sf::Event::MouseButtonReleased& mouse)
 {
-    OnAction = std::move(cb);
+    if (mouse.button != sf::Mouse::Button::Left)
+        return;
+
+    for (auto& button : Buttons)
+    {
+        if (!button.bPressed)
+            continue;
+
+        bool inside = IsButtonHovered(button);
+
+        if (inside && button.OnClick)
+            button.OnClick();
+
+        button.bPressed = false;
+        return;
+    }
 }
 
+/*
+    Joystick support mirrors mouse logic:
+    - Uses hover + press semantics
+*/
 void WindowControls::HandleEvent(const sf::Event::JoystickButtonPressed& joystick)
 {
     if (auto button = Input::HardwareToLogic(joystick.button, joystick.joystickId))
@@ -72,40 +112,78 @@ void WindowControls::HandleEvent(const sf::Event::JoystickButtonPressed& joystic
             if (!IsButtonHovered(b))
                 continue;
 
-            if (b.OnClick)
-                b.OnClick();
-
+            b.bPressed = true;
             return;
         }
     }
 }
 
+void WindowControls::HandleEvent(const sf::Event::JoystickButtonReleased& joystick)
+{
+    if (auto button = Input::HardwareToLogic(joystick.button, joystick.joystickId))
+    {
+        if (*button != GamepadButton::South)
+            return;
+
+        for (auto& b : Buttons)
+        {
+            if (!b.bPressed)
+                continue;
+
+            bool inside = IsButtonHovered(b);
+
+            if (inside && b.OnClick)
+                b.OnClick();
+
+            b.bPressed = false;
+            return;
+        }
+    }
+}
+
+
+/*
+    Updates button visuals based on state:
+    Priority:
+    1. Pressed
+    2. Hovered
+    3. Default
+*/
 void WindowControls::UpdateButtons()
 {
     for (auto& button : Buttons)
-    {
         UpdateButton(button);
-    }
 }
 
-void WindowControls::UpdateButton(Button& ButtonToUpdate)
+void WindowControls::UpdateButton(Button& button)
 {
-    sf::Color color = IsButtonHovered(ButtonToUpdate) ? BUTTON_HOVERED_COLOR : BUTTON_COLOR;
+    sf::Color targetColor = BUTTON_COLOR;
 
-    if (ButtonToUpdate.Shape.getFillColor() != color)
-    {
-        ButtonToUpdate.Shape.setFillColor(color);
-    }
+    if (button.bPressed)
+        targetColor = BUTTON_PRESSED_COLOR;
+    else if (IsButtonHovered(button))
+        targetColor = BUTTON_HOVERED_COLOR;
+
+    if (button.Shape.getFillColor() != targetColor)
+        button.Shape.setFillColor(targetColor);
 }
 
-bool WindowControls::IsButtonHovered(const Button& ButtonHovered) const
+bool WindowControls::IsButtonHovered(const Button& button) const
 {
-    return Contains(ButtonHovered.Shape, MGR.Cursor.GetPosition());
+    return Contains(button.Shape, MGR.Cursor.GetPosition());
+}
+
+void WindowControls::SetActionCallback(ActionCallback cb)
+{
+    OnAction = std::move(cb);
 }
 
 void WindowControls::OnEvent(const sf::Event& event)
 {
-    event.visit([this](const auto& type) { this->HandleEvent(type); });
+    event.visit([this](const auto& type)
+        {
+            HandleEvent(type);
+        });
 }
 
 void WindowControls::Update()
