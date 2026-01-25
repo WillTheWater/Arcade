@@ -11,35 +11,33 @@ namespace Bounce
         std::vector<Ball> Balls;
         Timer BallSpawnCooldown;
         Stats Stats;
-        sf::RectangleShape Background;
-        sf::Sound BounceSound;
-        sf::Music Music;
+
+        Timer ExtraLifeSpawnTimer;
+        std::optional<ExtraLife> ExtraLifePickup;
 
     public:
         Game(Managers&);
 
         void Start();
         void Update();
+        void UpdateExtraLife();
         void Render() const;
         void OnPause(bool);
-        void OnCleanup();
 
     private:
         void InitPaddle();
         void InitStats();
-        void InitBackground();
-        void InitBounceSound();
-        void InitMusic();
 
         void BindInputs();
 
         void StartPaddle();
         void StartStats();
-        void StartMusic();
 
         void UpdatePaddle();
         void UpdateBalls();
         void UpdateBall(Ball& BallToUpdate);
+
+        void EventSpawnExtraLife();
 
         void EventBallSpawn();
         void EventBallsMissed(int BallsMissed);

@@ -4,6 +4,7 @@
 #include <array>
 #include <cmath>
 #include <optional>
+#include <numbers>
 #include <ranges>
 #include <vector>
 #include <sfml/Audio/Sound.hpp>

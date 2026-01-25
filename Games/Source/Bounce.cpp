@@ -3,19 +3,17 @@
 Bounce::Game::Game(Managers& Mgr)
 	: Scene{Mgr}
 	, BallSpawnCooldown{BALL_SPAWN_COOLDOWN_DURATION}
-	, BounceSound{*MGR.Assets.GetSound(BOUNCE_SOUND_FILENAME)}
-	, Music{*MGR.Assets.GetMusic(MUSIC_FILENAME)}
+	, ExtraLifeSpawnTimer{ EXTRA_LIFE_SPAWN_INTERVAL }
 {
 	InitPaddle();
 	InitStats();
-	InitBackground();
-	InitBounceSound();
-	InitMusic();
 }
 
 void Bounce::Game::InitPaddle()
 {
 	Paddle.Shape.setFillColor(PADDLE_COLOR);
+	Paddle.Shape.setOutlineColor(OBJECT_OUTLINE_COLOR);
+	Paddle.Shape.setOutlineThickness(OBJECT_OUTLINE_THICKNESS);
 	Paddle.Shape.setSize(PADDLE_SIZE);
 	Paddle.Shape.setOrigin(Paddle.Shape.getGeometricCenter());
 	Paddle.Speed = PADDLE_SPEED;
@@ -23,32 +21,23 @@ void Bounce::Game::InitPaddle()
 
 void Bounce::Game::InitStats()
 {
-	Stats.ScoreText.setFillColor(STATS_SCORE_TEXT_COLOR);
-	Stats.ScoreText.setPosition({ 20,20 });
+	Stats.ScoreText.setFillColor(STATS_TEXT_COLOR);
+	Stats.ScoreText.setCharacterSize(STATS_TEXT_SIZE);
+	Stats.ScoreText.setOutlineColor(OUTLINE_COLOR);
+	Stats.ScoreText.setOutlineThickness(OUTLINE_THICKNESS);
+	Stats.ScoreText.setPosition({ 35,20 });
 
-	Stats.HighScoreText.setFillColor(STATS_HIGH_SCORE_TEXT_COLOR);
-	Stats.HighScoreText.setPosition({ 20,100 });
+	Stats.HighScoreText.setFillColor(STATS_TEXT_COLOR);
+	Stats.HighScoreText.setCharacterSize(STATS_TEXT_SIZE);
+	Stats.HighScoreText.setOutlineColor(OUTLINE_COLOR);
+	Stats.HighScoreText.setOutlineThickness(OUTLINE_THICKNESS);
+	Stats.HighScoreText.setPosition({ 35,80 });
 
-	Stats.LivesText.setFillColor(STATS_LIVES_TEXT_COLOR);
-	Stats.LivesText.setPosition({ 10, 180 });
-}
-
-void Bounce::Game::InitBackground()
-{
-	Background.setTexture(MGR.Assets.GetTexture(BACKGROUND_TEXTURE_FILENAME));
-	Background.setSize(EConfig.WindowSize);
-}
-
-void Bounce::Game::InitBounceSound()
-{
-	BounceSound.setVolume(BOUNCE_SOUND_VOLUME);
-}
-
-void Bounce::Game::InitMusic()
-{
-	Music.setVolume(MUSIC_VOLUME);
-	Music.setPitch(MUSIC_PITCH);
-	Music.setLooping(true);
+	Stats.LivesText.setFillColor(STATS_TEXT_COLOR);
+	Stats.LivesText.setCharacterSize(STATS_TEXT_SIZE);
+	Stats.LivesText.setOutlineColor(OUTLINE_COLOR);
+	Stats.LivesText.setOutlineThickness(OUTLINE_THICKNESS);
+	Stats.LivesText.setPosition({ 35, 140 });
 }
 
 void Bounce::Game::Start()
@@ -59,7 +48,6 @@ void Bounce::Game::Start()
 	Balls.clear();
 	StartPaddle();
 	StartStats();
-	StartMusic();
 	BallSpawnCooldown.Restart();
 }
 
@@ -91,10 +79,6 @@ void Bounce::Game::StartStats()
 	Stats.LivesText.setString("Lives: " + std::to_string(Stats.Lives));
 }
 
-void Bounce::Game::StartMusic()
-{
-	Music.play();
-}
 
 void Bounce::Game::UpdatePaddle()
 {
@@ -140,10 +124,33 @@ void Bounce::Game::UpdateBall(Ball& BallToUpdate)
 	}
 }
 
+void Bounce::Game::EventSpawnExtraLife()
+{
+	ExtraLifePickup.emplace();
+	auto& life = *ExtraLifePickup;
+
+	life.Shape.setSize({ EXTRA_LIFE_SIZE, EXTRA_LIFE_SIZE });
+	life.Shape.setOrigin(life.Shape.getGeometricCenter());
+	life.Shape.setFillColor(EXTRA_LIFE_COLOR);
+	life.Shape.setOutlineColor(OBJECT_OUTLINE_COLOR);
+	life.Shape.setOutlineThickness(OBJECT_OUTLINE_THICKNESS);
+
+	float minX = 40.f + EXTRA_LIFE_SIZE * 0.5f;
+	float maxX = EConfig.WindowSize.x - minX;
+
+	float x = MGR.Randomizer.Random(minX, maxX);
+
+	life.Shape.setPosition({ x, -100.f });
+	life.RotationSpeed = EXTRA_LIFE_ROTATION_SPEED;
+}
+
+
 void Bounce::Game::EventBallSpawn()
 {
 	auto& B = Balls.emplace_back();
-	B.Shape.setFillColor(BALL_COLOR);
+	B.Shape.setFillColor(BALL_COLORS[MGR.Randomizer.Random(0, (int)BALL_COLORS.size() - 1)]);
+	B.Shape.setOutlineColor(OBJECT_OUTLINE_COLOR);
+	B.Shape.setOutlineThickness(OBJECT_OUTLINE_THICKNESS);
 	B.Shape.setRadius(BALL_RADIUS);
 	B.Shape.setOrigin(B.Shape.getGeometricCenter());
 	B.Shape.setPosition(EConfig.WindowSize.componentWiseMul({ 0.50f, 0.25f }));
@@ -183,12 +190,26 @@ void Bounce::Game::HandleCollisionsPaddleBalls()
 
 void Bounce::Game::ResolveCollisionPaddleBall(Ball& CollidedBall)
 {
-	CollidedBall.Direction.y *= -1;
-	BounceSound.play();
+	float paddleX = Paddle.Shape.getPosition().x;
+	float ballX = CollidedBall.Shape.getPosition().x;
+	float halfWidth = Paddle.Shape.getSize().x * 0.5f;
+
+	float offset = (ballX - paddleX) / halfWidth;
+	offset = std::clamp(offset, -1.f, 1.f);
+
+	constexpr float MAX_ANGLE = 80.f;
+	float angleDeg = offset * MAX_ANGLE;
+	float angleRad = angleDeg * (std::numbers::pi_v<float> / 180.f);
+
+	CollidedBall.Direction = {
+		std::sin(angleRad),
+		-std::cos(angleRad)
+	};
 
 	Stats.Score += 5;
 	Stats.ScoreText.setString("Score: " + std::to_string(Stats.Score));
 }
+
 
 void Bounce::Game::HandleCollisionsBallsMap()
 {
@@ -210,19 +231,52 @@ void Bounce::Game::Update()
 		EventBallSpawn();
 		BallSpawnCooldown.Restart();
 	}
+	if (ExtraLifeSpawnTimer.IsOver() && !ExtraLifePickup)
+	{
+		EventSpawnExtraLife();
+		ExtraLifeSpawnTimer.Restart();
+	}
 	UpdatePaddle();
 	UpdateBalls();
+	UpdateExtraLife();
 	HandleCollisions();
 }
 
+void Bounce::Game::UpdateExtraLife()
+{
+	if (!ExtraLifePickup) return;
+
+	auto& life = *ExtraLifePickup;
+
+	life.Shape.move({ 0.f, EXTRA_LIFE_FALL_SPEED * MGR.Timer.GetDeltaTime() });
+	life.Shape.rotate(sf::degrees(EXTRA_LIFE_ROTATION_SPEED * MGR.Timer.GetDeltaTime()));
+
+	if (Intersects(life.Shape, Paddle.Shape))
+	{
+		Stats.Lives++;
+		Stats.LivesText.setString("Lives: " + std::to_string(Stats.Lives));
+		ExtraLifePickup.reset();
+		return;
+	}
+
+	if (IsOutsideWindowBottom(life.Shape))
+	{
+		ExtraLifePickup.reset();
+	}
+}
+
+
 void Bounce::Game::Render() const
 {
-	MGR.Renderer.Draw(Background);
 	MGR.Renderer.Draw(Paddle.Shape);
 
 	for (const auto& B : Balls)
 	{
 		MGR.Renderer.Draw(B.Shape);
+	}
+	if (ExtraLifePickup)
+	{
+		MGR.Renderer.Draw(ExtraLifePickup->Shape);
 	}
 
 	MGR.Renderer.Draw(Stats.ScoreText);
@@ -235,18 +289,9 @@ void Bounce::Game::OnPause(bool Paused)
 	if (Paused)
 	{
 		BallSpawnCooldown.Stop();
-		Music.pause();
-		BounceSound.stop();
 	}
 	else
 	{
 		BallSpawnCooldown.Start();
-		Music.play();
 	}
-}
-
-void Bounce::Game::OnCleanup()
-{
-	Music.stop();
-	BounceSound.stop();
 }

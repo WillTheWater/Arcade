@@ -32,4 +32,11 @@ namespace Bounce
         sf::Text HighScoreText{ GetDefaultFont() };
         sf::Text LivesText{ GetDefaultFont() };
     };
+
+    struct ExtraLife
+    {
+        sf::RectangleShape Shape;
+        float RotationSpeed;
+    };
+
 }

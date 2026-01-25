@@ -6,7 +6,7 @@ namespace Menu
 {
     const std::array BUTTON_NAMES =
     {
-        "Clicker",     /*"Memory Card",*/    /*"Tic Tac Toe",  "Mine Sweeper",*/
+        "Clicker",     "Bounce",    /*"Tic Tac Toe",  "Mine Sweeper",*/
         /*"Runner", */     "Tetris",       /*  "Pong",         "Breakout",
         "Flappy Bird", "Space Invaders", "Puzzle",       "Snake",
         "Mine Storm",  "Tower Defense",  "Level Editor", "Adventure"*/
