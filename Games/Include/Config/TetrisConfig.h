@@ -11,7 +11,7 @@ namespace Tetris
 
 	const int STATS_SCORE_PER_LINE = 100;
 
-	const float ACTION_COOLDOWN_DURATION = 0.25f;
+	const float ACTION_COOLDOWN_DURATION = 0.2f;
 	const float PIECE_FALL_COOLDOWN_DURATION = 0.5f;
 	const float SOFT_DROP_COOLDOWN_DURATION = 0.05f;
 

@@ -119,9 +119,22 @@ namespace Tetris
 
 	void Game::UpdateScoreOverTime()
 	{
-		PlayerStats.Score += static_cast<int>(10 * MGR.Timer.GetDeltaTime());
-		PlayerStats.ScoreText.setString("Score: " + std::to_string(PlayerStats.Score));
+		int currentSecond = static_cast<int>(LevelTimer.GetElapsedTime());
+
+		if (currentSecond > LastScoreSecond)
+		{
+			int secondsPassed = currentSecond - LastScoreSecond;
+
+			PlayerStats.Score += secondsPassed * 10 * PlayerStats.Level;
+
+			LastScoreSecond = currentSecond;
+
+			PlayerStats.ScoreText.setString(
+				"Score: " + std::to_string(PlayerStats.Score)
+			);
+		}
 	}
+
 
 	void Game::Render() const
 	{
@@ -191,8 +204,7 @@ namespace Tetris
 		PlayerStats.Score = 0;
 		PlayerStats.Level = 1;
 
-		PlayerStats.HighScore =
-			MGR.Save.Get<int>(STATS_HIGHSCORE_KEY, 0); // ADDED
+		PlayerStats.HighScore =	MGR.Save.Get<int>(STATS_HIGHSCORE_KEY, 0); // ADDED
 
 		PlayerStats.ScoreText.setString("Score: 0");
 		PlayerStats.HighScoreText.setString("High: " + std::to_string(PlayerStats.HighScore));
@@ -203,7 +215,6 @@ namespace Tetris
 	{
 		CurrentPiece = NextPiece;
 		NextPiece = GenerateRandomPiece();
-		HasStarted = true;
 	}
 
 	void Game::EventPieceRotate()
@@ -269,6 +280,9 @@ namespace Tetris
 			if (PlayerStats.Score > PlayerStats.HighScore)
 			{
 				MGR.Save.Set(STATS_HIGHSCORE_KEY, PlayerStats.Score);
+				PlayerStats.HighScore = std::max(PlayerStats.HighScore, PlayerStats.Score);
+				PlayerStats.HighScoreText.setString("High: " + std::to_string(PlayerStats.HighScore));
+
 			}
 			MGR.Scene.ReloadScene();
 		}
