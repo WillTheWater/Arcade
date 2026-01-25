@@ -58,12 +58,5 @@ namespace Tetris
 
 		void RenderBoard() const;
 		void RenderPiece(const Piece& PieceToRender, sf::Vector2f Origin, bool World) const;
-
-		void HandleEvent(const sf::Event::TextEntered&);
-		void HandleEvent(const sf::Event::KeyPressed&);
-		void HandleEvent(const sf::Event::JoystickButtonPressed&);
-		void HandleEvent(const sf::Event::MouseButtonPressed&);
-		void HandleEvent(const sf::Event::MouseWheelScrolled&);
-		void HandleEvent(const auto&) {}
 	};
 }

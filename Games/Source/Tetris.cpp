@@ -4,9 +4,9 @@ namespace Tetris
 {
 	Game::Game(Managers& Mgr)
 		: Scene{ Mgr }
-		, ActionCooldown{ACTION_COOLDOWN_DURATION}
-		, FallCooldown{PIECE_FALL_COOLDOWN_DURATION}
-		, DropCooldown{SOFT_DROP_COOLDOWN_DURATION}
+		, ActionCooldown{ ACTION_COOLDOWN_DURATION }
+		, FallCooldown{ PIECE_FALL_COOLDOWN_DURATION }
+		, DropCooldown{ SOFT_DROP_COOLDOWN_DURATION }
 		, StartCountdown{ START_COUNTDOWN_DURATION } // ADDED
 		, LevelTimer{ LEVEL_DURATION }               // ADDED
 	{
@@ -15,9 +15,20 @@ namespace Tetris
 
 	void Game::InitStats()
 	{
-		PlayerStats.ScoreText.setPosition({ 10,10 });
-		PlayerStats.HighScoreText.setPosition({ 10,40 }); // ADDED
-		PlayerStats.LevelText.setPosition({ 10,70 });     // ADDED
+		PlayerStats.ScoreText.setCharacterSize(STATS_TEXT_SIZE);
+		PlayerStats.ScoreText.setOutlineColor(OUTLINE_COLOR);
+		PlayerStats.ScoreText.setOutlineThickness(OUTLINE_THICKNESS);
+		PlayerStats.ScoreText.setPosition({ 25, 25 });
+
+		PlayerStats.HighScoreText.setCharacterSize(STATS_TEXT_SIZE);
+		PlayerStats.HighScoreText.setOutlineColor(OUTLINE_COLOR);
+		PlayerStats.HighScoreText.setOutlineThickness(OUTLINE_THICKNESS);
+		PlayerStats.HighScoreText.setPosition({ 25, 65 }); 
+		
+		PlayerStats.LevelText.setCharacterSize(STATS_TEXT_SIZE);
+		PlayerStats.LevelText.setOutlineColor(OUTLINE_COLOR);
+		PlayerStats.LevelText.setOutlineThickness(OUTLINE_THICKNESS);
+		PlayerStats.LevelText.setPosition({ 25, 105 });  
 	}
 
 	void Game::Start()
@@ -47,10 +58,6 @@ namespace Tetris
 		MGR.Input.Bind(MoveLeft, Input::Keyboard{ sf::Keyboard::Scan::A });
 		MGR.Input.Bind(MoveLeft, Input::Axis{ sf::Joystick::Axis::X, -0.5f });
 
-		MGR.Input.Bind(Rotate, Input::Keyboard{ sf::Keyboard::Scan::Up });
-		MGR.Input.Bind(Rotate, Input::Keyboard{ sf::Keyboard::Scan::W });
-		MGR.Input.Bind(Rotate, Input::Gamepad{ GamepadButton::North });
-
 		MGR.Input.Bind(SoftDrop, Input::Keyboard{ sf::Keyboard::Scan::Down });
 		MGR.Input.Bind(SoftDrop, Input::Keyboard{ sf::Keyboard::Scan::S });
 		MGR.Input.Bind(SoftDrop, Input::Axis{ sf::Joystick::Axis::Y, 0.5f });
@@ -79,6 +86,7 @@ namespace Tetris
 		{
 			AdvanceLevel();
 			LevelTimer.Restart();
+			LastScoreSecond = 0;
 		}
 
 		if (MGR.Input.Pressed(Rotate) && ActionCooldown.IsOver())
@@ -159,9 +167,18 @@ namespace Tetris
 			{
 				EventPieceDropHard();
 			}
+			if (Key->scancode == sf::Keyboard::Scan::W || Key->scancode == sf::Keyboard::Scan::Up)
+			{
+				EventPieceRotate();
+			}
 		}
+
 		if (auto Gamepad = Event.getIf<sf::Event::JoystickButtonPressed>())
 		{
+			if (Input::HardwareToLogic(Gamepad->button, Gamepad->joystickId) == GamepadButton::South)
+			{
+				EventPieceDropHard();
+			}
 			if (Input::HardwareToLogic(Gamepad->button, Gamepad->joystickId) == GamepadButton::South)
 			{
 				EventPieceDropHard();
@@ -204,7 +221,7 @@ namespace Tetris
 		PlayerStats.Score = 0;
 		PlayerStats.Level = 1;
 
-		PlayerStats.HighScore =	MGR.Save.Get<int>(STATS_HIGHSCORE_KEY, 0); // ADDED
+		PlayerStats.HighScore = MGR.Save.Get<int>(STATS_HIGHSCORE_KEY, 0); // ADDED
 
 		PlayerStats.ScoreText.setString("Score: 0");
 		PlayerStats.HighScoreText.setString("High: " + std::to_string(PlayerStats.HighScore));
@@ -320,7 +337,7 @@ namespace Tetris
 		NewPiece.Type = MGR.Randomizer.Random(0, PIECE_TYPE_COUNT - 1);
 		NewPiece.Rotation = 0;
 		NewPiece.Position = { (GRID_WIDTH / 2) - 2, 0 };
-		NewPiece.Color = MGR.Randomizer.Random(sf::Color::Black, sf::Color::White);
+		NewPiece.Color = PIECE_COLORS[MGR.Randomizer.Random(0, (int)PIECE_COLORS.size() - 1)];
 		return NewPiece;
 	}
 
@@ -366,60 +383,69 @@ namespace Tetris
 	void Game::RenderBoard() const
 	{
 		sf::Vector2f Origin = GetBoardOrigin();
+
 		sf::RectangleShape Shape({ BLOCK_SIZE, BLOCK_SIZE });
+
+		const sf::Texture* Texture =
+			MGR.Assets.GetTexture(BLOCK_TEXTURE_FILENAME);
+
+		Shape.setTexture(Texture, false);
 		Shape.setOutlineColor(GRID_COLOR);
 		Shape.setOutlineThickness(-1);
+
+		const sf::IntRect BlankRect({ 0, 0 }, { (int)BLOCK_SIZE, (int)BLOCK_SIZE });
+		const sf::IntRect BlockRect({ (int)BLOCK_SIZE, 0 }, { (int)BLOCK_SIZE, (int)BLOCK_SIZE });
 
 		for (int y = 0; y < GRID_HEIGHT; y++)
 		{
 			for (int x = 0; x < GRID_WIDTH; x++)
 			{
-				Shape.setFillColor(TetrisBoard[y][x].value_or(sf::Color::Transparent));
-				Shape.setPosition(Origin + sf::Vector2f(x * BLOCK_SIZE, y * BLOCK_SIZE));
+				// draw board background
+				Shape.setTextureRect(BlankRect);
+				Shape.setFillColor(BOARD_COLOR);
+				Shape.setPosition(
+					Origin + sf::Vector2f(x * BLOCK_SIZE, y * BLOCK_SIZE)
+				);
 				MGR.Renderer.Draw(Shape);
-			} 
+
+				// draw placed block
+				if (TetrisBoard[y][x].has_value())
+				{
+					Shape.setTextureRect(BlockRect);
+					Shape.setFillColor(*TetrisBoard[y][x]);
+					MGR.Renderer.Draw(Shape);
+				}
+			}
 		}
 	}
 
 	void Game::RenderPiece(const Piece& PieceToRender, sf::Vector2f Origin, bool World) const
 	{
 		sf::RectangleShape Shape({ BLOCK_SIZE, BLOCK_SIZE });
+
+		const sf::Texture* Texture =
+			MGR.Assets.GetTexture(BLOCK_TEXTURE_FILENAME);
+
+		Shape.setTexture(Texture, false);
+		Shape.setTextureRect({
+			{ (int)BLOCK_SIZE, 0 },
+			{ (int)BLOCK_SIZE, (int)BLOCK_SIZE }
+			});
 		Shape.setFillColor(PieceToRender.Color);
 
 		for (int i = 0; i < PIECE_BLOCK_COUNT; i++)
 		{
-			sf::Vector2i Block = GetPointRotated(PieceToRender.Type, i, PieceToRender.Rotation);
+			sf::Vector2i Block =
+				GetPointRotated(PieceToRender.Type, i, PieceToRender.Rotation);
+
 			if (World)
-			{
 				Block += PieceToRender.Position;
-			}
-			Shape.setPosition(Origin + sf::Vector2f(Block.x * BLOCK_SIZE, Block.y * BLOCK_SIZE));
+
+			Shape.setPosition(
+				Origin + sf::Vector2f(Block.x * BLOCK_SIZE, Block.y * BLOCK_SIZE)
+			);
 			MGR.Renderer.Draw(Shape);
 		}
 	}
 
-	void Game::HandleEvent(const sf::Event::TextEntered&)
-	{
-
-	}
-
-	void Game::HandleEvent(const sf::Event::KeyPressed&)
-	{
-
-	}
-
-	void Game::HandleEvent(const sf::Event::JoystickButtonPressed&)
-	{
-
-	}
-
-	void Game::HandleEvent(const sf::Event::MouseButtonPressed&)
-	{
-
-	}
-
-	void Game::HandleEvent(const sf::Event::MouseWheelScrolled&)
-	{
-
-	}
 }

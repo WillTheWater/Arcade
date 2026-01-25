@@ -38,11 +38,8 @@ namespace Clicker
 
 		bool IsTargetHovered() const;
 
-		void HandleEvent(const sf::Event::TextEntered&);
-		void HandleEvent(const sf::Event::KeyPressed&);
 		void HandleEvent(const sf::Event::JoystickButtonPressed&);
 		void HandleEvent(const sf::Event::MouseButtonPressed&);
-		void HandleEvent(const sf::Event::MouseWheelScrolled&);
 		void HandleEvent(const auto&) {}
 	};
 }

@@ -18,7 +18,20 @@ namespace Tetris
 	const int PIECE_TYPE_COUNT = 7;
 	const int PIECE_BLOCK_COUNT = 4;
 
+	const int STATS_TEXT_SIZE = 36;
+	const sf::Color OUTLINE_COLOR({ 65,96,157 });
+	const float OUTLINE_THICKNESS(3.f);
+
 	const sf::Color GRID_COLOR(125, 125, 125);
+	const sf::Color BOARD_COLOR(255, 255, 255, 125);
+	const std::array<sf::Color, 5> PIECE_COLORS =
+	{
+		sf::Color(85, 114, 156),
+		sf::Color(189, 125, 193),
+		sf::Color(109, 1, 73),
+		sf::Color(107, 26, 152),
+		sf::Color(162, 9, 121)
+	};
 
 	// ADDED: countdown + level tuning
 	const float START_COUNTDOWN_DURATION = 3.f;
@@ -27,6 +40,7 @@ namespace Tetris
 
 	// ADDED: save key
 	const std::string_view STATS_HIGHSCORE_KEY = "TETRIS_HIGHSCORE";
+	const std::string BLOCK_TEXTURE_FILENAME = "block.png";
 
 	const std::vector<std::vector<sf::Vector2i>> PIECE_SHAPES =
 	{

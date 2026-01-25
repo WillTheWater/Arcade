@@ -52,6 +52,8 @@ void Game::InitButton(Button& button, sf::FloatRect bounds, std::string name)
     std::ranges::replace(name, ' ', ' ');
 
     button.Text.setFillColor(BUTTON_TEXT_COLOR);
+    button.Text.setOutlineColor(TEXT_OUTLINE_COLOR);
+    button.Text.setOutlineThickness(TEXT_OUTLINE_THICKNESS);
     button.Text.setString(name);
     button.Text.setCharacterSize(BUTTON_TEXT_SIZE);
     button.Text.setOrigin(button.Text.getLocalBounds().getCenter());
@@ -77,14 +79,14 @@ void Game::InitControls()
 
 void Game::InitMusic()
 {
-    Music.setVolume(MUSIC_VOLUME);
+    Music.setVolume(0);
     Music.setPitch(MUSIC_PITCH);
 }
 
 void Game::Start()
 {
     StartControls();
-    StartMusic();
+    //StartMusic();
 }
 
 void Game::StartControls()
@@ -94,7 +96,7 @@ void Game::StartControls()
 
 void Game::StartMusic()
 {
-    Music.play();
+    //Music.play();
 }
 
 void Game::OnEvent(const sf::Event& event)

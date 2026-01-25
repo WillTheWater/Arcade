@@ -6,25 +6,27 @@ namespace Menu
 {
     const std::array BUTTON_NAMES =
     {
-        "Clicker",     "Memory Card",    "Tic Tac Toe",  "Mine Sweeper",
-        "Runner",      "Tetris",         "Pong",         "Breakout",
+        "Clicker",     /*"Memory Card",*/    /*"Tic Tac Toe",  "Mine Sweeper",*/
+        /*"Runner", */     "Tetris",       /*  "Pong",         "Breakout",
         "Flappy Bird", "Space Invaders", "Puzzle",       "Snake",
-        "Mine Storm",  "Tower Defense",  "Level Editor", "Adventure"
+        "Mine Storm",  "Tower Defense",  "Level Editor", "Adventure"*/
     };
 
     const int BUTTONS_PER_ROW = 4;
     const float BUTTON_PADDING_RATIO = 0.5f;
 
-    const int BUTTON_TEXT_SIZE = 24;
+    const int BUTTON_TEXT_SIZE = 36;
 
     const int CONTROLS_TEXT_SIZE = 30;
 
     const float MUSIC_VOLUME = 0;
     const float MUSIC_PITCH = 1;
+    const float TEXT_OUTLINE_THICKNESS = 3;
 
     const sf::Color BUTTON_COLOR(sf::Color::White);
     const sf::Color BUTTON_HOVERED_COLOR({180,180,180});
     const sf::Color BUTTON_TEXT_COLOR(sf::Color::Black);
+    const sf::Color TEXT_OUTLINE_COLOR(sf::Color({255, 169, 254}));
     const sf::Color CONTROLS_TEXT_COLOR(175, 175, 175);
     const sf::Color CONTROLS_BACKGROUND_COLOR(0, 0, 0, 225);
 

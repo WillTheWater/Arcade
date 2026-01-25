@@ -9,7 +9,7 @@ namespace Clicker
     const float TARGET_RADIUS = 30;
     const float TARGET_TELEPORT_COOLDOWN_DURATION = 2;
     
-    const int STATS_SCORE_GOAL = 30;
+    const int STATS_SCORE_GOAL = 20;
     const float STATS_FINAL_COOLDOWN_DURATION = 20;
     const int STATS_TEXT_SIZE = 50;
     

@@ -28,6 +28,10 @@ add_executable(Arcade
     ${HEADERS}
 )
 
+if(WIN32)
+    set_target_properties(Arcade PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
+
 set_target_properties(Arcade PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:Arcade>"
 )
