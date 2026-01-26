@@ -1,14 +1,14 @@
 #pragma once
 #include "Config/RunnerConfig.h"
 
-namespace Dino
+namespace Duck
 {
     enum Action
     {
-        Duck
+        Ducked
     };
 
-    struct Dino
+    struct Duck
     {
         sf::RectangleShape Shape;
         sf::Vector2f Velocity;

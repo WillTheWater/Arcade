@@ -1,38 +1,38 @@
 #include "Runner.h"
 
-Dino::Game::Game(Managers& Mgr)
+Duck::Game::Game(Managers& Mgr)
     : Scene{ Mgr }
     , ObstacleSpawnTimer{ OBSTACLE_SPAWN_INTERVAL }
 {
-    InitDino();
+    InitDuck();
     InitGround();
     InitStats();
 }
 
-void Dino::Game::InitDino()
+void Duck::Game::InitDuck()
 {
-    Dino.Shape.setSize(DINO_SIZE);
-    Dino.Shape.setOrigin(DINO_SIZE / 2.f);
-    Dino.Shape.setFillColor(DINO_COLOR);
+    Duck.Shape.setSize(DUCK_SIZE);
+    Duck.Shape.setOrigin(DUCK_SIZE / 2.f);
+    Duck.Shape.setFillColor(DUCK_COLOR);
 
-    Dino.Shape.setPosition({
+    Duck.Shape.setPosition({
         EConfig.WindowSize.x * 0.2f,
-        -DINO_SIZE.y    // ABOVE window
+        -DUCK_SIZE.y    // ABOVE window
         });
 
-    Dino.Velocity = { 0.f, 0.f };
-    Dino.IsOnGround = false;
-    Dino.IsDucking = false;
+    Duck.Velocity = { 0.f, 0.f };
+    Duck.IsOnGround = false;
+    Duck.IsDucking = false;
 }
 
-float Dino::Game::GetGroundSnapY(float dinoHeight) const
+float Duck::Game::GetGroundSnapY(float dinoHeight) const
 {
     return Ground.getPosition().y
         - GROUND_SIZE.y / 2.f
         - dinoHeight / 2.f;
 }
 
-void Dino::Game::InitGround()
+void Duck::Game::InitGround()
 {
     Ground.setSize(GROUND_SIZE);
     Ground.setFillColor(GROUND_COLOR);
@@ -42,7 +42,7 @@ void Dino::Game::InitGround()
     Ground.setPosition({EConfig.WindowSize.x * 0.5f, EConfig.WindowSize.y * 0.70f});
 }
 
-void Dino::Game::InitStats()
+void Duck::Game::InitStats()
 {
     Stats.Score = 0;
 
@@ -59,12 +59,12 @@ void Dino::Game::InitStats()
     Stats.HighScoreText.setString("High Score: " + std::to_string(Stats.HighScore));
 }
 
-bool Dino::Game::CanJump()
+bool Duck::Game::CanJump()
 {
-    return Dino.IsOnGround;
+    return Duck.IsOnGround;
 }
 
-void Dino::Game::Start()
+void Duck::Game::Start()
 {
     MGR.Cursor.SetVisibility(false);
 
@@ -72,16 +72,16 @@ void Dino::Game::Start()
     Obstacles.clear();
     ObstacleSpawnTimer.Restart();
 
-    Dino.Velocity = { 0.f, 0.f };
-    Dino.IsOnGround = false;
-    Dino.IsDucking = false;
+    Duck.Velocity = { 0.f, 0.f };
+    Duck.IsOnGround = false;
+    Duck.IsDucking = false;
 
-    Dino.Shape.setSize(DINO_SIZE);
-    Dino.Shape.setOrigin(DINO_SIZE / 2.f);
+    Duck.Shape.setSize(DUCK_SIZE);
+    Duck.Shape.setOrigin(DUCK_SIZE / 2.f);
 
-    Dino.Shape.setPosition({
-        Dino.Shape.getPosition().x,
-        -DINO_SIZE.y   // FORCE fall-in every start
+    Duck.Shape.setPosition({
+        Duck.Shape.getPosition().x,
+        -DUCK_SIZE.y   // FORCE fall-in every start
         });
 
     ScoreStartTime = MGR.Timer.GetElapsedTime();
@@ -90,43 +90,43 @@ void Dino::Game::Start()
 }
 
 
-void Dino::Game::BindInputs()
+void Duck::Game::BindInputs()
 {
     // Duck
-    MGR.Input.Bind(Duck, Input::Keyboard{ sf::Keyboard::Scancode::Down });
-    MGR.Input.Bind(Duck, Input::Keyboard{ sf::Keyboard::Scancode::S });
+    MGR.Input.Bind(Ducked, Input::Keyboard{ sf::Keyboard::Scancode::Down });
+    MGR.Input.Bind(Ducked, Input::Keyboard{ sf::Keyboard::Scancode::S });
 }
 
-void Dino::Game::UpdateDino()
+void Duck::Game::UpdateDuck()
 {
     const float dt = MGR.Timer.GetDeltaTime();
 
 
-    if (MGR.Input.Pressed(Duck) && !Dino.IsDucking)
+    if (MGR.Input.Pressed(Ducked) && !Duck.IsDucking)
     {
-        Dino.IsDucking = true;
-        Dino.Shape.setSize(DINO_DUCK_SIZE);
-        Dino.Shape.setOrigin(DINO_DUCK_SIZE / 2.f);
+        Duck.IsDucking = true;
+        Duck.Shape.setSize(DUCK_DUCK_SIZE);
+        Duck.Shape.setOrigin(DUCK_DUCK_SIZE / 2.f);
 
-        if (Dino.IsOnGround)
+        if (Duck.IsOnGround)
         {
-            Dino.Shape.setPosition({
-                Dino.Shape.getPosition().x,
-                GetGroundSnapY(DINO_DUCK_SIZE.y)
+            Duck.Shape.setPosition({
+                Duck.Shape.getPosition().x,
+                GetGroundSnapY(DUCK_DUCK_SIZE.y)
                 });
         }
     }
-    else if (!MGR.Input.Pressed(Duck) && Dino.IsDucking)
+    else if (!MGR.Input.Pressed(Ducked) && Duck.IsDucking)
     {
-        Dino.IsDucking = false;
-        Dino.Shape.setSize(DINO_SIZE);
-        Dino.Shape.setOrigin(DINO_SIZE / 2.f);
+        Duck.IsDucking = false;
+        Duck.Shape.setSize(DUCK_SIZE);
+        Duck.Shape.setOrigin(DUCK_SIZE / 2.f);
 
-        if (Dino.IsOnGround)
+        if (Duck.IsOnGround)
         {
-            Dino.Shape.setPosition({
-                Dino.Shape.getPosition().x,
-                GetGroundSnapY(DINO_SIZE.y)
+            Duck.Shape.setPosition({
+                Duck.Shape.getPosition().x,
+                GetGroundSnapY(DUCK_SIZE.y)
                 });
         }
     }
@@ -134,25 +134,25 @@ void Dino::Game::UpdateDino()
     // REMOVED: auto-jump logic (was causing infinite jumping)
 
     // Gravity
-    Dino.Velocity.y += GRAVITY * dt;
-    Dino.Shape.move(Dino.Velocity * dt);
+    Duck.Velocity.y += GRAVITY * dt;
+    Duck.Shape.move(Duck.Velocity * dt);
 
     // Ground collision
-    float groundY = GetGroundSnapY(Dino.Shape.getSize().y);
+    float groundY = GetGroundSnapY(Duck.Shape.getSize().y);
 
-    if (Dino.Shape.getPosition().y >= groundY)
+    if (Duck.Shape.getPosition().y >= groundY)
     {
-        Dino.Shape.setPosition({ Dino.Shape.getPosition().x, groundY });
-        Dino.Velocity.y = 0.f;
-        Dino.IsOnGround = true;
+        Duck.Shape.setPosition({ Duck.Shape.getPosition().x, groundY });
+        Duck.Velocity.y = 0.f;
+        Duck.IsOnGround = true;
     }
     else
     {
-        Dino.IsOnGround = false;
+        Duck.IsOnGround = false;
     }
 }
 
-void Dino::Game::UpdateObstacles()
+void Duck::Game::UpdateObstacles()
 {
     if (ObstacleSpawnTimer.IsOver())
     {
@@ -171,7 +171,7 @@ void Dino::Game::UpdateObstacles()
         });
 }
 
-void Dino::Game::EventObstacleSpawn()
+void Duck::Game::EventObstacleSpawn()
 {
     auto& O = Obstacles.emplace_back();
     O.Shape.setSize(OBSTACLE_SIZE);
@@ -183,37 +183,37 @@ void Dino::Game::EventObstacleSpawn()
     O.Shape.setPosition({ x, y });
 }
 
-void Dino::Game::HandleCollisions()
+void Duck::Game::HandleCollisions()
 {
     for (auto& O : Obstacles)
     {
-        if (Intersects(Dino.Shape, O.Shape))
+        if (Intersects(Duck.Shape, O.Shape))
         {
-            EventDinoHit();
+            EventDuckHit();
             break;
         }
     }
 }
 
-void Dino::Game::EventDinoHit()
+void Duck::Game::EventDuckHit()
 {
     MGR.Save.Set(STATS_HIGH_SCORE_KEY, std::max(Stats.Score, Stats.HighScore));
     MGR.Scene.ReloadScene();
 }
 
-void Dino::Game::EventJump()
+void Duck::Game::EventJump()
 {
     if (!CanJump())
         return;
 
-    Dino.Velocity.y = -DINO_JUMP_FORCE;
-    Dino.IsOnGround = false;
+    Duck.Velocity.y = -DUCK_JUMP_FORCE;
+    Duck.IsOnGround = false;
 }
 
 
-void Dino::Game::Update()
+void Duck::Game::Update()
 {
-    UpdateDino();
+    UpdateDuck();
     UpdateObstacles();
 
     HandleCollisions();
@@ -224,10 +224,10 @@ void Dino::Game::Update()
     Stats.ScoreText.setString("Score: " + std::to_string(Stats.Score));
 }
 
-void Dino::Game::Render() const
+void Duck::Game::Render() const
 {
     MGR.Renderer.Draw(Ground);
-    MGR.Renderer.Draw(Dino.Shape);
+    MGR.Renderer.Draw(Duck.Shape);
 
     for (const auto& O : Obstacles)
         MGR.Renderer.Draw(O.Shape);
@@ -236,12 +236,12 @@ void Dino::Game::Render() const
     MGR.Renderer.Draw(Stats.HighScoreText);
 }
 
-void Dino::Game::OnEvent(const sf::Event& event)
+void Duck::Game::OnEvent(const sf::Event& event)
 {
     event.visit([this](const auto& type) { this->HandleEvent(type); });
 }
 
-void Dino::Game::HandleEvent(const sf::Event::JoystickButtonPressed& Gamepad)
+void Duck::Game::HandleEvent(const sf::Event::JoystickButtonPressed& Gamepad)
 {
     if (auto button = Input::HardwareToLogic(Gamepad.button, Gamepad.joystickId))
     {
@@ -252,7 +252,7 @@ void Dino::Game::HandleEvent(const sf::Event::JoystickButtonPressed& Gamepad)
     }
 }
 
-void Dino::Game::HandleEvent(const sf::Event::KeyPressed& Key)
+void Duck::Game::HandleEvent(const sf::Event::KeyPressed& Key)
 {
     
     if (Key.scancode == sf::Keyboard::Scan::Space || Key.scancode == sf::Keyboard::Scan::Up

@@ -2,12 +2,12 @@
 
 #include "Types/RunnerTypes.h"
 
-namespace Dino
+namespace Duck
 {
     class Game : public Scene
     {
     private:
-        Dino Dino;
+        Duck Duck;
         std::vector<Obstacle> Obstacles;
         sf::RectangleShape Ground;
         Timer ObstacleSpawnTimer;
@@ -25,7 +25,7 @@ namespace Dino
         float ScoreStartTime = 0.f;
 
     private:
-        void InitDino();
+        void InitDuck();
         void InitGround();
         void InitStats();
         void BindInputs();
@@ -33,12 +33,12 @@ namespace Dino
         bool CanJump();
         float GetGroundSnapY(float dinoHeight) const;
 
-        void UpdateDino();
+        void UpdateDuck();
         void UpdateObstacles();
 
         void EventObstacleSpawn();
         void HandleCollisions();
-        void EventDinoHit();
+        void EventDuckHit();
         void EventJump();
 
         void HandleEvent(const sf::Event::JoystickButtonPressed& Gamepad);
