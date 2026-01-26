@@ -1,17 +1,12 @@
 #pragma once
 
 #include "Types/RunnerTypes.h"
+#include "Animation/SpriteSheets.h"
 
 namespace Duck
 {
     class Game : public Scene
     {
-    private:
-        Duck Duck;
-        std::vector<Obstacle> Obstacles;
-        sf::RectangleShape Ground;
-        Timer ObstacleSpawnTimer;
-        Stats Stats;
 
     public:
         Game(Managers&);
@@ -20,21 +15,33 @@ namespace Duck
         void Update();
         void OnEvent(const sf::Event& event);
         void Render() const;
+    
+    private:
+        Duck Duck;
+        std::vector<Obstacle> Obstacles;
+        sf::RectangleShape Ground;
+        Timer ObstacleSpawnTimer;
+        Stats Stats;
 
     private:
         float ScoreStartTime = 0.f;
+        Animation DuckAnim;
+        AnimationConfig RunAnimConfig;
+        AnimationConfig DuckRunAnimConfig;
 
     private:
         void InitDuck();
         void InitGround();
         void InitStats();
         void BindInputs();
+        void InitAnimations();          // ADDED
 
         bool CanJump();
-        float GetGroundSnapY(float dinoHeight) const;
+        float GetGroundSnapY() const;
 
         void UpdateDuck();
         void UpdateObstacles();
+        void UpdateDuckAnimation();     // ADDED
 
         void EventObstacleSpawn();
         void HandleCollisions();

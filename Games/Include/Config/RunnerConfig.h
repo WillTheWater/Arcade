@@ -4,11 +4,13 @@
 
 namespace Duck
 {
-    const sf::Vector2f DUCK_SIZE(60, 160);
-    const sf::Vector2f DUCK_DUCK_SIZE(60, 80);
+    const sf::Vector2f DUCK_COLLISION_SIZE(60, 160);
+    const sf::Vector2f DUCK_DUCK_COLLISION_SIZE(60, 80);
+    const sf::Vector2f DUCK_SPRITE_SIZE(196, 196);
     const float DUCK_RUN_SPEED = 600.f;
     const float DUCK_JUMP_FORCE = 1000.f;
     const float GRAVITY = 2800.f;
+    const float OFFSET = 24.f;
 
     const sf::Vector2f OBSTACLE_SIZE(40, 60);
     const float OBSTACLE_SPEED = 600.f;
@@ -25,4 +27,7 @@ namespace Duck
     const int STATS_TEXT_SIZE = 48;
 
     const std::string_view STATS_HIGH_SCORE_KEY = "Dino:HighScore";
+
+    const std::string RUN_SPRITESHEET_FILENAME = "ducksheet.png";
+    const std::string DUCKING_RUN_SPRITESHEET_FILENAME = "duckducksheet.png";
 }

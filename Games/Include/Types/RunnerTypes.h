@@ -8,12 +8,21 @@ namespace Duck
         Ducked
     };
 
+    enum class AnimState
+    {
+        Run,
+        Jump,
+        DuckRun,
+        DuckJump
+    };
+
     struct Duck
     {
         sf::RectangleShape Shape;
         sf::Vector2f Velocity;
         bool IsOnGround = true;
         bool IsDucking = false;
+        AnimState State = AnimState::Run;
     };
 
     struct Obstacle

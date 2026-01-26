@@ -7,17 +7,20 @@ Duck::Game::Game(Managers& Mgr)
     InitDuck();
     InitGround();
     InitStats();
+    InitAnimations(); // ADDED
 }
 
 void Duck::Game::InitDuck()
 {
-    Duck.Shape.setSize(DUCK_SIZE);
-    Duck.Shape.setOrigin(DUCK_SIZE / 2.f);
-    Duck.Shape.setFillColor(DUCK_COLOR);
+    Duck.Shape.setSize(DUCK_COLLISION_SIZE);
+    Duck.Shape.setOrigin({
+     DUCK_COLLISION_SIZE.x / 2.f,
+     DUCK_COLLISION_SIZE.y
+        });
 
     Duck.Shape.setPosition({
         EConfig.WindowSize.x * 0.2f,
-        -DUCK_SIZE.y    // ABOVE window
+        -DUCK_COLLISION_SIZE.y    // ABOVE window
         });
 
     Duck.Velocity = { 0.f, 0.f };
@@ -25,12 +28,12 @@ void Duck::Game::InitDuck()
     Duck.IsDucking = false;
 }
 
-float Duck::Game::GetGroundSnapY(float dinoHeight) const
+float Duck::Game::GetGroundSnapY() const
 {
-    return Ground.getPosition().y
-        - GROUND_SIZE.y / 2.f
-        - dinoHeight / 2.f;
+    // bottom-center: collision origin is bottom, so just align with top of ground
+    return Ground.getPosition().y - GROUND_SIZE.y / 2.f;
 }
+
 
 void Duck::Game::InitGround()
 {
@@ -59,6 +62,26 @@ void Duck::Game::InitStats()
     Stats.HighScoreText.setString("High Score: " + std::to_string(Stats.HighScore));
 }
 
+void Duck::Game::InitAnimations()
+{
+    RunAnimConfig = {
+        MGR.Assets.GetTexture(RUN_SPRITESHEET_FILENAME),
+        { 3, 2 },
+        0.1f
+    };
+
+    DuckRunAnimConfig = {
+        MGR.Assets.GetTexture(DUCKING_RUN_SPRITESHEET_FILENAME),
+        { 3, 2 },
+        0.1f
+    };
+
+    DuckAnim.setSize(DUCK_SPRITE_SIZE);
+    DuckAnim.Start(RunAnimConfig);
+    DuckAnim.setOrigin({ DUCK_SPRITE_SIZE.x / 2.f,DUCK_SPRITE_SIZE.y });
+}
+
+
 bool Duck::Game::CanJump()
 {
     return Duck.IsOnGround;
@@ -76,17 +99,17 @@ void Duck::Game::Start()
     Duck.IsOnGround = false;
     Duck.IsDucking = false;
 
-    Duck.Shape.setSize(DUCK_SIZE);
-    Duck.Shape.setOrigin(DUCK_SIZE / 2.f);
+    Duck.Shape.setSize(DUCK_COLLISION_SIZE);
+    //Duck.Shape.setOrigin(DUCK_COLLISION_SIZE / 2.f);
+    // Debug
+    Duck.Shape.setFillColor({ 255,0,0,120 });
 
-    Duck.Shape.setPosition({
-        Duck.Shape.getPosition().x,
-        -DUCK_SIZE.y   // FORCE fall-in every start
-        });
+    Duck.Shape.setPosition({Duck.Shape.getPosition().x, -DUCK_COLLISION_SIZE.y });
 
     ScoreStartTime = MGR.Timer.GetElapsedTime();
     Stats.Score = 0;
     Stats.ScoreText.setString("Score: 0");
+
 }
 
 
@@ -101,45 +124,37 @@ void Duck::Game::UpdateDuck()
 {
     const float dt = MGR.Timer.GetDeltaTime();
 
+    // Preserve foot position before resizing
+    const float footY = Duck.Shape.getPosition().y;
 
+    // Duck input
     if (MGR.Input.Pressed(Ducked) && !Duck.IsDucking)
     {
         Duck.IsDucking = true;
-        Duck.Shape.setSize(DUCK_DUCK_SIZE);
-        Duck.Shape.setOrigin(DUCK_DUCK_SIZE / 2.f);
-
-        if (Duck.IsOnGround)
-        {
-            Duck.Shape.setPosition({
-                Duck.Shape.getPosition().x,
-                GetGroundSnapY(DUCK_DUCK_SIZE.y)
-                });
-        }
+        Duck.Shape.setSize(DUCK_DUCK_COLLISION_SIZE);
+        Duck.Shape.setOrigin({
+            DUCK_DUCK_COLLISION_SIZE.x / 2.f,
+            DUCK_DUCK_COLLISION_SIZE.y
+            });
+        Duck.Shape.setPosition({ Duck.Shape.getPosition().x, footY });
     }
     else if (!MGR.Input.Pressed(Ducked) && Duck.IsDucking)
     {
         Duck.IsDucking = false;
-        Duck.Shape.setSize(DUCK_SIZE);
-        Duck.Shape.setOrigin(DUCK_SIZE / 2.f);
-
-        if (Duck.IsOnGround)
-        {
-            Duck.Shape.setPosition({
-                Duck.Shape.getPosition().x,
-                GetGroundSnapY(DUCK_SIZE.y)
-                });
-        }
+        Duck.Shape.setSize(DUCK_COLLISION_SIZE);
+        Duck.Shape.setOrigin({
+            DUCK_COLLISION_SIZE.x / 2.f,
+            DUCK_COLLISION_SIZE.y
+            });
+        Duck.Shape.setPosition({ Duck.Shape.getPosition().x, footY });
     }
-
-    // REMOVED: auto-jump logic (was causing infinite jumping)
 
     // Gravity
     Duck.Velocity.y += GRAVITY * dt;
     Duck.Shape.move(Duck.Velocity * dt);
 
     // Ground collision
-    float groundY = GetGroundSnapY(Duck.Shape.getSize().y);
-
+    float groundY = GetGroundSnapY();
     if (Duck.Shape.getPosition().y >= groundY)
     {
         Duck.Shape.setPosition({ Duck.Shape.getPosition().x, groundY });
@@ -150,7 +165,45 @@ void Duck::Game::UpdateDuck()
     {
         Duck.IsOnGround = false;
     }
+
+    // Update state
+    if (!Duck.IsOnGround)
+        Duck.State = Duck.IsDucking ? AnimState::DuckJump : AnimState::Jump;
+    else
+        Duck.State = Duck.IsDucking ? AnimState::DuckRun : AnimState::Run;
 }
+
+
+void Duck::Game::UpdateDuckAnimation()
+{
+    const float dt = MGR.Timer.GetDeltaTime();
+
+    switch (Duck.State)
+    {
+    case AnimState::Run:
+        DuckAnim.Start(RunAnimConfig);
+        DuckAnim.SetRow(0);
+        break;
+
+    case AnimState::Jump:
+        DuckAnim.Start(RunAnimConfig);
+        DuckAnim.SetRow(1);
+        break;
+
+    case AnimState::DuckRun:
+        DuckAnim.Start(DuckRunAnimConfig);
+        DuckAnim.SetRow(0);
+        break;
+
+    case AnimState::DuckJump:
+        DuckAnim.Start(DuckRunAnimConfig);
+        DuckAnim.SetRow(1);
+        break;
+    }
+
+    DuckAnim.setPosition({ Duck.Shape.getPosition().x, Duck.Shape.getPosition().y + OFFSET });
+}
+
 
 void Duck::Game::UpdateObstacles()
 {
@@ -214,12 +267,12 @@ void Duck::Game::EventJump()
 void Duck::Game::Update()
 {
     UpdateDuck();
+    UpdateDuckAnimation();
     UpdateObstacles();
 
     HandleCollisions();
 
     float elapsed = MGR.Timer.GetElapsedTime() - ScoreStartTime;
-
     Stats.Score = static_cast<int>(elapsed * 10.f);
     Stats.ScoreText.setString("Score: " + std::to_string(Stats.Score));
 }
@@ -227,6 +280,9 @@ void Duck::Game::Update()
 void Duck::Game::Render() const
 {
     MGR.Renderer.Draw(Ground);
+    MGR.Renderer.Draw(DuckAnim);
+
+    // Debug
     MGR.Renderer.Draw(Duck.Shape);
 
     for (const auto& O : Obstacles)
