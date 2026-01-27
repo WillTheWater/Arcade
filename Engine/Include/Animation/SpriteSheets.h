@@ -21,6 +21,7 @@ public:
     bool Update(float DeltaTime);
 
     void SetRow(int RowIndex);
+    void SetFrame(sf::Vector2i frame);
     bool IsFinished() const;
 
 private:
@@ -29,3 +30,4 @@ private:
     sf::Vector2i FrameSize;
     float ElapsedTime;
 };
+

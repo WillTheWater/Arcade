@@ -48,6 +48,18 @@ void Animation::SetRow(int rowIndex)
     }
 }
 
+void Animation::SetFrame(sf::Vector2i frame)
+{
+    frame.x = std::clamp(frame.x, 0,
+        AnimConfig.FrameCountPerRow[frame.y] - 1);
+
+    CurrentFrame = frame;
+    ElapsedTime = 0.f;
+
+    setTextureRect({ CurrentFrame.componentWiseMul(FrameSize), FrameSize });
+}
+
+
 bool Animation::IsFinished() const
 {
     return !AnimConfig.Looping && CurrentFrame.x == AnimConfig.FrameCountPerRow[CurrentFrame.y] - 1;

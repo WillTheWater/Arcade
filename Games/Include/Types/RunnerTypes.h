@@ -16,6 +16,13 @@ namespace Duck
         DuckJump
     };
 
+    enum class ObstacleType            // NEW
+    {
+        JumpOnly,
+        DuckOnly,
+        Either
+    };
+
     struct Duck
     {
         sf::RectangleShape Shape;
@@ -25,9 +32,10 @@ namespace Duck
         AnimState State = AnimState::Run;
     };
 
-    struct Obstacle
+    struct Obstacle                    // CHANGED
     {
         sf::RectangleShape Shape;
+        ObstacleType Type;
     };
 
     struct Stats

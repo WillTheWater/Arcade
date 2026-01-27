@@ -34,6 +34,74 @@ float Duck::Game::GetGroundSnapY() const
     return Ground.getPosition().y - GROUND_SIZE.y / 2.f;
 }
 
+// ============================== OBSTACLES ======================================
+float Duck::Game::GetObstacleY(ObstacleType type) const
+{
+    float groundTop = Ground.getPosition().y - GROUND_SIZE.y / 2.f;
+
+    switch (type)
+    {
+    case ObstacleType::JumpOnly:
+        // On ground
+        return groundTop - OBSTACLE_SIZE.y / 2.f;
+
+    case ObstacleType::Either:
+        // Mid height
+        return groundTop - OBSTACLE_MID_HEIGHT;
+
+    case ObstacleType::DuckOnly:
+        // High enough to require ducking
+        return groundTop - OBSTACLE_DUCK_HEIGHT;
+    }
+
+    return groundTop;
+}
+
+void Duck::Game::EventObstacleSpawn()
+{
+    auto& O = Obstacles.emplace_back();
+
+    O.Shape.setSize(OBSTACLE_SIZE);
+    O.Shape.setOrigin(OBSTACLE_SIZE / 2.f);
+    O.Shape.setFillColor(OBSTACLE_COLOR);
+
+    // Random obstacle type
+    int r = MGR.Randomizer.Random(0, 2);
+    if (r == 0)      O.Type = ObstacleType::JumpOnly;
+    else if (r == 1) O.Type = ObstacleType::Either;
+    else             O.Type = ObstacleType::DuckOnly;
+
+    float x = EConfig.WindowSize.x + OBSTACLE_SIZE.x;
+    float y = GetObstacleY(O.Type);
+
+    O.Shape.setPosition({ x, y });
+}
+
+void Duck::Game::UpdateObstacles()
+{
+    if (ObstacleSpawnTimer.IsOver())
+    {
+        EventObstacleSpawn();
+        ObstacleSpawnTimer.Restart();
+    }
+
+    float dt = MGR.Timer.GetDeltaTime();
+
+    float t = GameTimer.GetElapsedTime();
+    float ramp = (OBSTACLE_MAX_SPEED - OBSTACLE_BASE_SPEED) / OBSTACLE_SPEED_RAMP;
+
+    float speed = OBSTACLE_BASE_SPEED + ramp * t;
+    if (speed > OBSTACLE_MAX_SPEED)
+        speed = OBSTACLE_MAX_SPEED;
+
+    for (auto& O : Obstacles)
+        O.Shape.move({ -speed * dt, 0.f });
+
+    std::erase_if(Obstacles, [](const Obstacle& O)
+        {
+            return IsOutsideWindowLeft(O.Shape);
+        });
+}
 
 void Duck::Game::InitGround()
 {
@@ -81,7 +149,6 @@ void Duck::Game::InitAnimations()
     DuckAnim.setOrigin({ DUCK_SPRITE_SIZE.x / 2.f,DUCK_SPRITE_SIZE.y });
 }
 
-
 bool Duck::Game::CanJump()
 {
     return Duck.IsOnGround;
@@ -94,6 +161,7 @@ void Duck::Game::Start()
     BindInputs();
     Obstacles.clear();
     ObstacleSpawnTimer.Restart();
+    GameTimer.Restart();
 
     Duck.Velocity = { 0.f, 0.f };
     Duck.IsOnGround = false;
@@ -111,7 +179,6 @@ void Duck::Game::Start()
     Stats.ScoreText.setString("Score: 0");
 
 }
-
 
 void Duck::Game::BindInputs()
 {
@@ -173,67 +240,44 @@ void Duck::Game::UpdateDuck()
         Duck.State = Duck.IsDucking ? AnimState::DuckRun : AnimState::Run;
 }
 
-
 void Duck::Game::UpdateDuckAnimation()
 {
-    const float dt = MGR.Timer.GetDeltaTime();
-
-    switch (Duck.State)
+    if (Duck.State != PrevState)
     {
-    case AnimState::Run:
-        DuckAnim.Start(RunAnimConfig);
-        DuckAnim.SetRow(0);
-        break;
-
-    case AnimState::Jump:
-        DuckAnim.Start(RunAnimConfig);
-        DuckAnim.SetRow(1);
-        break;
-
-    case AnimState::DuckRun:
-        DuckAnim.Start(DuckRunAnimConfig);
-        DuckAnim.SetRow(0);
-        break;
-
-    case AnimState::DuckJump:
-        DuckAnim.Start(DuckRunAnimConfig);
-        DuckAnim.SetRow(1);
-        break;
-    }
-
-    DuckAnim.setPosition({ Duck.Shape.getPosition().x, Duck.Shape.getPosition().y + OFFSET });
-}
-
-
-void Duck::Game::UpdateObstacles()
-{
-    if (ObstacleSpawnTimer.IsOver())
-    {
-        EventObstacleSpawn();
-        ObstacleSpawnTimer.Restart();
-    }
-
-    float dt = MGR.Timer.GetDeltaTime();
-    for (auto& O : Obstacles)
-        O.Shape.move({ -OBSTACLE_SPEED * dt, 0.f });
-
-    // Remove off-screen
-    std::erase_if(Obstacles, [](const Obstacle& O)
+        switch (Duck.State)
         {
-            return IsOutsideWindowLeft(O.Shape);
+        case AnimState::Run:
+            DuckAnim.Start(RunAnimConfig);
+            DuckAnim.SetRow(0);
+            break;
+
+        case AnimState::DuckRun:
+            DuckAnim.Start(DuckRunAnimConfig);
+            DuckAnim.SetRow(0);
+            break;
+
+        case AnimState::Jump:
+            DuckAnim.Start(RunAnimConfig);
+            DuckAnim.SetFrame({ 0, 1 });   // static jump pose
+            break;
+
+        case AnimState::DuckJump:
+            DuckAnim.Start(DuckRunAnimConfig);
+            DuckAnim.SetFrame({ 0, 1 });
+            break;
+        }
+
+        PrevState = Duck.State;
+    }
+
+    // Only animate ground states
+    if (Duck.State == AnimState::Run || Duck.State == AnimState::DuckRun)
+        DuckAnim.Update(MGR.Timer.GetDeltaTime());
+
+    DuckAnim.setPosition({
+        Duck.Shape.getPosition().x,
+        Duck.Shape.getPosition().y + OFFSET
         });
-}
-
-void Duck::Game::EventObstacleSpawn()
-{
-    auto& O = Obstacles.emplace_back();
-    O.Shape.setSize(OBSTACLE_SIZE);
-    O.Shape.setOrigin(OBSTACLE_SIZE / 2.f);
-    O.Shape.setFillColor(OBSTACLE_COLOR);
-
-    float x = EConfig.WindowSize.x + OBSTACLE_SIZE.x;
-    float y = Ground.getPosition().y - GROUND_SIZE.y / 2.f - OBSTACLE_SIZE.y / 2.f;
-    O.Shape.setPosition({ x, y });
 }
 
 void Duck::Game::HandleCollisions()
@@ -263,7 +307,6 @@ void Duck::Game::EventJump()
     Duck.IsOnGround = false;
 }
 
-
 void Duck::Game::Update()
 {
     UpdateDuck();
@@ -283,7 +326,7 @@ void Duck::Game::Render() const
     MGR.Renderer.Draw(DuckAnim);
 
     // Debug
-    MGR.Renderer.Draw(Duck.Shape);
+    //MGR.Renderer.Draw(Duck.Shape);
 
     for (const auto& O : Obstacles)
         MGR.Renderer.Draw(O.Shape);
