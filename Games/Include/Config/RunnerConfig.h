@@ -7,7 +7,7 @@ namespace Duck
     // Duck
     const sf::Vector2f DUCK_COLLISION_SIZE(60, 160);
     const sf::Vector2f DUCK_DUCK_COLLISION_SIZE(60, 80);
-    const sf::Vector2f DUCK_SPRITE_SIZE(196, 196);
+    const sf::Vector2f DUCK_SPRITE_SIZE(192, 196);
     const float DUCK_RUN_SPEED = 600.f;
     const float DUCK_JUMP_FORCE = 1100.f;
     const float GRAVITY = 2900.f;
@@ -32,8 +32,8 @@ namespace Duck
 
     // Colors
     const sf::Color DUCK_COLOR(sf::Color::White);
-    const sf::Color OBSTACLE_COLOR(sf::Color::Red);
-    const sf::Color GROUND_COLOR(sf::Color(80, 80, 80));
+    const sf::Color OBSTACLE_COLOR(189, 125, 193);
+    const sf::Color GROUND_COLOR({ 65,96,157 });
 
     // UI
     const sf::Color STATS_TEXT_COLOR(sf::Color::White);
@@ -41,6 +41,6 @@ namespace Duck
     const std::string_view STATS_HIGH_SCORE_KEY = "Dino:HighScore";
 
     // Assets
-    const std::string RUN_SPRITESHEET_FILENAME = "ducksheet.png";
-    const std::string DUCKING_RUN_SPRITESHEET_FILENAME = "duckducksheet.png";
+    const std::string RUN_SPRITESHEET_FILENAME = "runsheet.png";
+    const std::string DUCKING_RUN_SPRITESHEET_FILENAME = "duckedsheet.png";
 }

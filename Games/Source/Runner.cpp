@@ -135,13 +135,13 @@ void Duck::Game::InitAnimations()
     RunAnimConfig = {
         MGR.Assets.GetTexture(RUN_SPRITESHEET_FILENAME),
         { 3, 2 },
-        0.1f
+        0.08f
     };
 
     DuckRunAnimConfig = {
         MGR.Assets.GetTexture(DUCKING_RUN_SPRITESHEET_FILENAME),
         { 3, 2 },
-        0.1f
+        0.08f
     };
 
     DuckAnim.setSize(DUCK_SPRITE_SIZE);
