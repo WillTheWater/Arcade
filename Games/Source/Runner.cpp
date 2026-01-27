@@ -64,6 +64,8 @@ void Duck::Game::EventObstacleSpawn()
     O.Shape.setSize(OBSTACLE_SIZE);
     O.Shape.setOrigin(OBSTACLE_SIZE / 2.f);
     O.Shape.setFillColor(OBSTACLE_COLOR);
+    O.Shape.setOutlineColor(sf::Color::White);
+    O.Shape.setOutlineThickness(-2);
 
     // Random obstacle type
     int r = MGR.Randomizer.Random(0, 2);

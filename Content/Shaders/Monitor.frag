@@ -9,7 +9,7 @@ const float CONTRAST     = 0.50;
 const float SATURATION   = 0.50;
 const float VIGNETTE     = 0.15;
 const float COLOR_ADJUST = 1.35;
-const float SPEED        = 3.50;
+const float SPEED        = 2.50;
 
 void main()
 {

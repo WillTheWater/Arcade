@@ -47,12 +47,14 @@ void Bloom::Render(const sf::Shader& Shader, sf::RenderTexture& Output)
 {
     const sf::Vector2f OutSize(Output.getSize());
 
+    // FIXED: Flip texture coordinates vertically for render textures
+    // SFML render textures use OpenGL coordinates (Y=0 at bottom)
     const sf::Vertex Quad[] =
     {
-        {{0,0}, sf::Color::White, {0,1}},
-        {{OutSize.x,0}, sf::Color::White, {1,1}},
-        {{0,OutSize.y}, sf::Color::White, {0,1}},
-        {{OutSize}, sf::Color::White, {1,0}}
+        {{0,0}, sf::Color::White, {0,1}},           // Bottom-left
+        {{OutSize.x,0}, sf::Color::White, {1,1}},   // Bottom-right  
+        {{0,OutSize.y}, sf::Color::White, {0,0}},   // Top-left
+        {{OutSize.x,OutSize.y}, sf::Color::White, {1,0}} // Top-right
     };
 
     sf::RenderStates States(&Shader);

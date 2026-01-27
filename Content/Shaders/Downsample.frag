@@ -3,21 +3,22 @@
 uniform sampler2D sourceTexture;
 uniform vec2 texelSize;
 
+const float THRESHOLD = 0.4;
+
 void main()
 {
-    const vec2 offsets[4] = vec2[4](
-        vec2(1.0, 0.0), vec2(0.0, 1.0), vec2(1.0, 1.0), vec2(1.0, -1.0)
-    );
-
     vec2 uv = gl_TexCoord[0].xy;
-    vec4 color = texture2D(sourceTexture, uv);
 
-    for (int i = 0; i < 4; i++)
-    {
-        vec2 offset = texelSize * offsets[i];
-        color += texture2D(sourceTexture, uv + offset);
-        color += texture2D(sourceTexture, uv - offset);
-    }
+    vec3 color = texture2D(sourceTexture, uv).rgb;
 
-    gl_FragColor = color / 9.0;
+    // Convert to linear space (approx)
+    color = pow(color, vec3(2.2));
+
+    // Luminance
+    float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
+
+    // Threshold
+    color *= max(brightness - THRESHOLD, 0.0);
+
+    gl_FragColor = vec4(color, 1.0);
 }

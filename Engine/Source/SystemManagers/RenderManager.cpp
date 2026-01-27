@@ -7,8 +7,8 @@
 
 //#include "Graphics/Effects/Invert.h"
 //#include "Graphics/Effects/Glitch.h"
-//#include "Graphics/Effects/Bloom.h"
-//#include "Graphics/Effects/CRT.h"
+#include "Graphics/Effects/Bloom.h"
+#include "Graphics/Effects/CRT.h"
 
 RenderManager::RenderManager()
 	: RenderTarget{ sf::Vector2u(EConfig.WindowSize) }
@@ -23,8 +23,8 @@ RenderManager::RenderManager()
 	{
 		ASSERT(PPETarget.resize(sf::Vector2u(EConfig.WindowSize)));
 
-		//PostProcessEffects.emplace_back(std::make_unique<CRT>());
-		//PostProcessEffects.emplace_back(std::make_unique<Bloom>());
+		PostProcessEffects.emplace_back(std::make_unique<Bloom>());
+		PostProcessEffects.emplace_back(std::make_unique<CRT>());
 	}
 }
 
