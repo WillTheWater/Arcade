@@ -1,0 +1,3 @@
+// Icon.rc
+IDI_ICON1 ICON "@ICON_PATH@"
+

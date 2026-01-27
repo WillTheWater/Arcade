@@ -8,6 +8,18 @@
 #include "Scenes/SceneFactory.h"
 #include "Core/Overlay.h"
 
+namespace
+{
+	sf::ContextSettings MakeContextSettings()
+	{
+		sf::ContextSettings s;
+		s.majorVersion = 2;
+		s.minorVersion = 1;
+		s.attributeFlags = sf::ContextSettings::Default;
+		return s;
+	}
+}
+
 class Engine
 {
 public:

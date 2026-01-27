@@ -9,7 +9,7 @@
 #include "Utilities/Log.h"
 
 Engine::Engine()
-	: GameWindow{ sf::VideoMode(sf::Vector2u(EConfig.WindowSize)), EConfig.WindowTitle, sf::Style::None, sf::State::Windowed}
+	: GameWindow{ sf::VideoMode(sf::Vector2u(EConfig.WindowSize)), EConfig.WindowTitle, sf::Style::None, sf::State::Windowed, MakeContextSettings() }
 	, Manager{GameWindow}
 	, Scenes{SceneFactory::CreateScenes(Manager)}
 	, CurrentScene{nullptr}

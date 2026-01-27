@@ -23,9 +23,18 @@ file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Games/Include/*.h
 )
 
+set(ICON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Content/icon.ico")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/Engine/Include/Utilities/Icon.rc"
+    "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc"
+    @ONLY
+)
+
+
 add_executable(Arcade
     ${SOURCES}
     ${HEADERS}
+    ${CMAKE_CURRENT_BINARY_DIR}/Icon.rc
 )
 
 if(WIN32)

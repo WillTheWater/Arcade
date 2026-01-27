@@ -19,7 +19,7 @@ namespace SceneFactory
 		SceneList.emplace("Bounce", std::make_unique<Bounce::Game>(Manager));
 		SceneList.emplace("Clicker", std::make_unique<Clicker::Game>(Manager));
 		SceneList.emplace("Tetris", std::make_unique<Tetris::Game>(Manager));
-		SceneList.emplace("Runner", std::make_unique<Duck::Game>(Manager));
+		SceneList.emplace("Duck Run", std::make_unique<Duck::Game>(Manager));
 
 		return SceneList;
 	}
