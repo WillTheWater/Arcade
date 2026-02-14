@@ -23,7 +23,7 @@ namespace Tetris
 	const float OUTLINE_THICKNESS(3.f);
 
 	const sf::Color GRID_COLOR(125, 125, 125);
-	const sf::Color BOARD_COLOR(255, 255, 255, 125);
+	const sf::Color BOARD_COLOR(255, 255, 255, 230);
 	const std::array<sf::Color, 5> PIECE_COLORS =
 	{
 		sf::Color(85, 114, 156),
