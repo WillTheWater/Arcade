@@ -35,7 +35,7 @@ namespace Tetris
 
 	// ADDED: countdown + level tuning
 	const float START_COUNTDOWN_DURATION = 3.f;
-	const float LEVEL_DURATION = 30.f;
+	const float LEVEL_DURATION = 60.f;
 	const float FALL_SPEED_MULTIPLIER = 0.85f;
 
 	// ADDED: save key

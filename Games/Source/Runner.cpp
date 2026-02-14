@@ -117,19 +117,19 @@ void Duck::Game::InitGround()
 
 void Duck::Game::InitStats()
 {
-    Stats.Score = 0;
+    PlayerStats.HighScore = MGR.Save.Get<int>(STATS_HIGHSCORE_KEY, 0);  // Load FIRST
+    LOG("Init High Score: {}", PlayerStats.HighScore);
+    PlayerStats.Score = 0;
 
-    Stats.ScoreText.setFillColor(STATS_TEXT_COLOR);
-    Stats.ScoreText.setCharacterSize(STATS_TEXT_SIZE);
-    Stats.ScoreText.setPosition({ 30, 30 });
-    Stats.ScoreText.setString("Score: 0");
+    PlayerStats.ScoreText.setFillColor(STATS_TEXT_COLOR);
+    PlayerStats.ScoreText.setCharacterSize(STATS_TEXT_SIZE);
+    PlayerStats.ScoreText.setPosition({ 30, 30 });
+    PlayerStats.ScoreText.setString("Score: 0");
 
-    Stats.HighScore = MGR.Save.Get<int>(STATS_HIGH_SCORE_KEY);
-
-    Stats.HighScoreText.setFillColor(STATS_TEXT_COLOR);
-    Stats.HighScoreText.setCharacterSize(STATS_TEXT_SIZE);
-    Stats.HighScoreText.setPosition({ 30, 90 });
-    Stats.HighScoreText.setString("High Score: " + std::to_string(Stats.HighScore));
+    PlayerStats.HighScoreText.setFillColor(STATS_TEXT_COLOR);
+    PlayerStats.HighScoreText.setCharacterSize(STATS_TEXT_SIZE);
+    PlayerStats.HighScoreText.setPosition({ 30, 90 });
+    PlayerStats.HighScoreText.setString("High Score: " + std::to_string(PlayerStats.HighScore));
 }
 
 void Duck::Game::InitAnimations()
@@ -170,15 +170,13 @@ void Duck::Game::Start()
     Duck.IsDucking = false;
 
     Duck.Shape.setSize(DUCK_COLLISION_SIZE);
-    //Duck.Shape.setOrigin(DUCK_COLLISION_SIZE / 2.f);
-    // Debug
     Duck.Shape.setFillColor({ 255,0,0,120 });
 
     Duck.Shape.setPosition({Duck.Shape.getPosition().x, -DUCK_COLLISION_SIZE.y });
 
     ScoreStartTime = MGR.Timer.GetElapsedTime();
-    Stats.Score = 0;
-    Stats.ScoreText.setString("Score: 0");
+    PlayerStats.Score = 0;
+    PlayerStats.ScoreText.setString("Score: 0");
 
 }
 
@@ -296,7 +294,15 @@ void Duck::Game::HandleCollisions()
 
 void Duck::Game::EventDuckHit()
 {
-    MGR.Save.Set(STATS_HIGH_SCORE_KEY, std::max(Stats.Score, Stats.HighScore));
+    if (PlayerStats.Score > PlayerStats.HighScore)
+    {
+        MGR.Save.Set(STATS_HIGHSCORE_KEY, PlayerStats.Score);
+        PlayerStats.HighScore = PlayerStats.Score;
+
+        PlayerStats.HighScoreText.setString("High Score: " + std::to_string(PlayerStats.HighScore));
+
+        LOG("New High Score: {}", PlayerStats.HighScore);
+    }
     MGR.Scene.ReloadScene();
 }
 
@@ -318,8 +324,8 @@ void Duck::Game::Update()
     HandleCollisions();
 
     float elapsed = MGR.Timer.GetElapsedTime() - ScoreStartTime;
-    Stats.Score = static_cast<int>(elapsed * 10.f);
-    Stats.ScoreText.setString("Score: " + std::to_string(Stats.Score));
+    PlayerStats.Score = static_cast<int>(elapsed * 10.f);
+    PlayerStats.ScoreText.setString("Score: " + std::to_string(PlayerStats.Score));
 }
 
 void Duck::Game::Render() const
@@ -333,8 +339,8 @@ void Duck::Game::Render() const
     for (const auto& O : Obstacles)
         MGR.Renderer.Draw(O.Shape);
 
-    MGR.Renderer.Draw(Stats.ScoreText);
-    MGR.Renderer.Draw(Stats.HighScoreText);
+    MGR.Renderer.Draw(PlayerStats.ScoreText);
+    MGR.Renderer.Draw(PlayerStats.HighScoreText);
 }
 
 void Duck::Game::OnEvent(const sf::Event& event)

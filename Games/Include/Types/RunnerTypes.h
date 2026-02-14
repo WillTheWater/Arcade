@@ -40,8 +40,8 @@ namespace Duck
 
     struct Stats
     {
-        int Score;
-        int HighScore;
+        int Score = 0;
+        int HighScore = 0;
         sf::Text ScoreText{ GetDefaultFont() };
         sf::Text HighScoreText{ GetDefaultFont() };
     };

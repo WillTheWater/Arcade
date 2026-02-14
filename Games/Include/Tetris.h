@@ -28,7 +28,7 @@ namespace Tetris
 		Timer StartCountdown;
 		Timer LevelTimer;
 
-		bool HasStarted = false; // ADDED
+		bool HasStarted = false;
 		int LastScoreSecond = 0;
 
 	private:

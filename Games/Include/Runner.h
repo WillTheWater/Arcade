@@ -21,7 +21,7 @@ namespace Duck
         sf::RectangleShape Ground;
         Timer ObstacleSpawnTimer;
         Timer GameTimer;
-        Stats Stats;
+        Stats PlayerStats;
 
         float ScoreStartTime = 0.f;
 
@@ -32,7 +32,7 @@ namespace Duck
         AnimState PrevState = AnimState::Run;
 
         // Difficulty
-        float LastObstacleX = 0.f;                   // NEW
+        float LastObstacleX = 0.f;  
 
     private:
         void InitDuck();
@@ -43,7 +43,7 @@ namespace Duck
 
         bool CanJump();
         float GetGroundSnapY() const;
-        float GetObstacleY(ObstacleType type) const; // NEW
+        float GetObstacleY(ObstacleType type) const;
 
         void UpdateDuck();
         void UpdateObstacles();

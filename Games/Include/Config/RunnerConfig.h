@@ -15,16 +15,16 @@ namespace Duck
 
     // Obstacles
     const sf::Vector2f OBSTACLE_SIZE(50, 50);
-    const float OBSTACLE_BASE_SPEED = 600.f;         // CHANGED
-    const float OBSTACLE_MAX_SPEED = 2400.f;         // NEW
-    const float OBSTACLE_SPEED_RAMP = 120.f;          // NEW
+    const float OBSTACLE_BASE_SPEED = 600.f;     
+    const float OBSTACLE_MAX_SPEED = 2400.f;       
+    const float OBSTACLE_SPEED_RAMP = 120.f;     
 
     const float OBSTACLE_SPAWN_INTERVAL = 1.5f;
-    const float OBSTACLE_MIN_DISTANCE = 350.f;       // NEW
-    const float OBSTACLE_MAX_DISTANCE = 650.f;       // NEW
+    const float OBSTACLE_MIN_DISTANCE = 350.f; 
+    const float OBSTACLE_MAX_DISTANCE = 650.f;    
 
-    const float OBSTACLE_DUCK_HEIGHT = 160.f;        // NEW
-    const float OBSTACLE_MID_HEIGHT = 110.f;         // NEW
+    const float OBSTACLE_DUCK_HEIGHT = 160.f;   
+    const float OBSTACLE_MID_HEIGHT = 110.f;      
 
     // Ground
     const sf::Vector2f GROUND_SIZE(1054, 50);
@@ -38,7 +38,7 @@ namespace Duck
     // UI
     const sf::Color STATS_TEXT_COLOR(sf::Color::White);
     const int STATS_TEXT_SIZE = 48;
-    const std::string_view STATS_HIGH_SCORE_KEY = "Dino:HighScore";
+    const std::string_view STATS_HIGHSCORE_KEY = "DUCK_HIGHSCORE";
 
     // Assets
     const std::string RUN_SPRITESHEET_FILENAME = "runsheet.png";
